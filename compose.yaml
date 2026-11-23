@@ -1,0 +1,17 @@
+services:
+  explorer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /workspace
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/workspace
+      - acmm_explorer_node_modules:/workspace/node_modules
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    command: npm run dev
+
+volumes:
+  acmm_explorer_node_modules:
