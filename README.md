@@ -6,7 +6,7 @@ ACMM Explorer is intentionally separate from the frozen ACMM research and experi
 
 ## Current status
 
-The project now includes the first ACMM-aware export adapter. The current build includes:
+The project now includes ACMM-aware export viewing plus the first Decision Workshop foundation. The current build includes:
 
 - React + TypeScript + Vite frontend foundation.
 - Docker-contained development environment.
@@ -20,6 +20,8 @@ The project now includes the first ACMM-aware export adapter. The current build 
 - Cross-agent dimension comparison rendered from the same selected analysis snapshot, with merged-radar and grouped-bar views.
 - Availability summaries and trajectory summaries when those analysis tables are present.
 - Source links from profile rows back to the exact exported analysis table.
+- Paginated file inventory with filename search and file-type filtering.
+- Decision Workshop with a persisted local function store, built-in presets, a bounded expression evaluator, merged canonical radar, and conditional cross-agent ranking.
 - Failure-aware ingestion stages that mark the failed stage and block later stages visually.
 - Reference-search shell for future generated CLI/schema documentation.
 - No server-side storage, upload service, or external data processing.
@@ -74,6 +76,8 @@ src/
   components/       shared and top-level views
   data/             generic ingestion, package adapters, shared data types
   explorer/         experiment-data exploration UI
+  decision/         decision-function model, presets, store, and expression evaluator
+  workshop/         decision workshop UI
   reference/        CLI/schema/concept reference UI
   visualization/    chart components and visualization primitives
 ```
@@ -90,7 +94,7 @@ Data ingestion is separated under `src/data/`. Generic readers inventory and pre
 - **read-excel-file**: browser-side `.xlsx` reading for raw worksheet previews.
 - **yaml**: browser-compatible YAML parsing for ACMM export and analysis manifests.
 
-New substantial frontend libraries should be introduced only when a concrete feature needs them.
+New substantial frontend libraries should be introduced only when a concrete feature needs them. The Decision Workshop currently uses no additional dependency: custom functions are stored in browser `localStorage`, and expressions are evaluated by a project-owned parser rather than JavaScript `eval`.
 
 ## Design rules
 
@@ -101,6 +105,7 @@ New substantial frontend libraries should be introduced only when a concrete fea
 5. New analytical interpretations must be explicitly separated from canonical ACMM results.
 6. Demo data must be visibly marked and must never be confused with experiment evidence.
 7. Interface copy should stay concise and functional. Richness belongs primarily in data views, tables, plots, filtering, and drill-down interactions rather than promotional or presentation-oriented text.
+8. Decision Workshop outputs are conditional user-defined decision results, not canonical ACMM good/bad scores. Canonical profile values remain unchanged by workshop functions.
 
 ## License
 

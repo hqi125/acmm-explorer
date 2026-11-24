@@ -29,6 +29,8 @@ import { ComplianceRadar } from "../visualization/ComplianceRadar";
 import { ComplianceComparison } from "../visualization/ComplianceComparison";
 import { ComplianceMultiRadar } from "../visualization/ComplianceMultiRadar";
 
+const inventoryPageSize = 20;
+
 const dimensionLabels: Record<ComplianceDimension, string> = {
   goal: "Goal",
   obligation: "Obligation",
@@ -570,6 +572,7 @@ export function ExplorerView()
   const [previewLoading, setPreviewLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [kindFilter, setKindFilter] = useState<DataFileKind | "all">("all");
+  const [inventoryPage, setInventoryPage] = useState(1);
   const [cacheInfo, setCacheInfo] = useState<CachedExportInfo | null>(null);
   const [cacheError, setCacheError] = useState<string | null>(null);
   const [restoringCache, setRestoringCache] = useState(false);
@@ -611,19 +614,31 @@ export function ExplorerView()
         return false;
       }
 
-      if (normalizedQuery.length > 0)
+      if (normalizedQuery.length > 0 && !basename(entry.path).toLowerCase().includes(normalizedQuery))
       {
-        const haystack = `${entry.path} ${entry.sourceName} ${entry.kind}`.toLowerCase();
-        if (!haystack.includes(normalizedQuery))
-        {
-          return false;
-        }
+        return false;
       }
 
       return true;
     });
   }, [inspection, kindFilter, query]);
 
+
+  const inventoryPageCount = Math.max(1, Math.ceil(filteredEntries.length / inventoryPageSize));
+  const pagedEntries = useMemo(() =>
+  {
+    const start = (inventoryPage - 1) * inventoryPageSize;
+    return filteredEntries.slice(start, start + inventoryPageSize);
+  }, [filteredEntries, inventoryPage]);
+
+
+  useEffect(() =>
+  {
+    if (inventoryPage > inventoryPageCount)
+    {
+      setInventoryPage(inventoryPageCount);
+    }
+  }, [inventoryPage, inventoryPageCount]);
   const kindCounts = useMemo(() =>
   {
     const counts = new Map<DataFileKind, number>();
@@ -649,6 +664,7 @@ export function ExplorerView()
     setPreview(null);
     setQuery("");
     setKindFilter("all");
+    setInventoryPage(1);
     if (inputRef.current !== null)
     {
       inputRef.current.value = "";
@@ -832,6 +848,8 @@ export function ExplorerView()
 
     setQuery("");
     setKindFilter("all");
+    const inventoryIndex = inspection?.entries.findIndex((candidate) => candidate.id === entry.id) ?? -1;
+    setInventoryPage(inventoryIndex < 0 ? 1 : Math.floor(inventoryIndex / inventoryPageSize) + 1);
     void selectEntry(entry);
     window.setTimeout(() => document.querySelector(".preview-card")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   };
@@ -1086,9 +1104,13 @@ export function ExplorerView()
                     className="inventory-search"
                     type="search"
                     value={query}
-                    placeholder="Filter paths..."
-                    aria-label="Filter file inventory"
-                    onChange={(event: ChangeEvent<HTMLInputElement>) => setQuery(event.target.value)}
+                    placeholder="Search file names..."
+                    aria-label="Search file names"
+                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    {
+                      setQuery(event.target.value);
+                      setInventoryPage(1);
+                    }}
                   />
                 </div>
 
@@ -1096,7 +1118,11 @@ export function ExplorerView()
                   <button
                     className={kindFilter === "all" ? "filter-chip filter-chip-active" : "filter-chip"}
                     type="button"
-                    onClick={() => setKindFilter("all")}
+                    onClick={() =>
+                    {
+                      setKindFilter("all");
+                      setInventoryPage(1);
+                    }}
                   >
                     All <span>{inspection.entries.length}</span>
                   </button>
@@ -1113,7 +1139,11 @@ export function ExplorerView()
                         className={kindFilter === kind ? "filter-chip filter-chip-active" : "filter-chip"}
                         type="button"
                         key={kind}
-                        onClick={() => setKindFilter(kind)}
+                        onClick={() =>
+                        {
+                          setKindFilter(kind);
+                          setInventoryPage(1);
+                        }}
                       >
                         {kindLabel(kind)} <span>{count}</span>
                       </button>
@@ -1122,7 +1152,7 @@ export function ExplorerView()
                 </div>
 
                 <div className="inventory-list">
-                  {filteredEntries.map((entry) => (
+                  {pagedEntries.map((entry) => (
                     <button
                       className={selectedEntryId === entry.id ? "inventory-row inventory-row-active" : "inventory-row"}
                       type="button"
@@ -1144,10 +1174,37 @@ export function ExplorerView()
                   {filteredEntries.length === 0 && (
                     <div className="preview-empty compact-empty">
                       <strong>No matching files.</strong>
-                      <span>Change the path search or file-type filter.</span>
+                      <span>Change the file-name search or file-type filter.</span>
                     </div>
                   )}
                 </div>
+
+                {filteredEntries.length > 0 && (
+                  <div className="inventory-pagination" aria-label="File inventory pagination">
+                    <span>
+                      {((inventoryPage - 1) * inventoryPageSize) + 1}-{Math.min(inventoryPage * inventoryPageSize, filteredEntries.length)} of {filteredEntries.length}
+                    </span>
+                    <div className="pagination-controls">
+                      <button
+                        className="pagination-button"
+                        type="button"
+                        disabled={inventoryPage <= 1}
+                        onClick={() => setInventoryPage((page) => Math.max(1, page - 1))}
+                      >
+                        Previous
+                      </button>
+                      <span>Page {inventoryPage} of {inventoryPageCount}</span>
+                      <button
+                        className="pagination-button"
+                        type="button"
+                        disabled={inventoryPage >= inventoryPageCount}
+                        onClick={() => setInventoryPage((page) => Math.min(inventoryPageCount, page + 1))}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                )}
               </section>
 
               <section className="preview-card">
