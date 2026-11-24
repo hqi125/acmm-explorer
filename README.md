@@ -2,7 +2,7 @@
 
 Local-only experiment-data explorer and usage reference for the Agent Compliance Metric Model (ACMM).
 
-ACMM Explorer is intentionally separate from the frozen ACMM research and experiment repositories. It is a local, read-only working interface: experiment outputs are opened locally, normalized by version-aware adapters, inspected through tables and visualizations, and linked back to their source evidence. The reference area provides a searchable lookup surface for ACMM commands, schemas, and project concepts.
+ACMM Explorer is intentionally separate from the frozen ACMM research and experiment repositories. It is a local, read-only working interface: experiment outputs are opened locally, normalized by version-aware adapters, inspected through tables and visualizations, and linked back to their source evidence. The reference area provides a searchable lookup surface for ACMM commands, source JSON Schemas, observed data artifacts, fields, and project concepts.
 
 ## Current status
 
@@ -25,7 +25,7 @@ The project now includes ACMM-aware export viewing plus a reusable Decision Work
 - Recipe-defined parameter controls with optional min/max/step metadata, procedural number/slider rendering, and optional parameter-group transforms such as sum-to-one normalization.
 - Versioned local decision-recipe JSON import/export (`acmm-explorer-decision-recipe/0.3`), with backward-compatible import of `0.1` and `0.2` recipes.
 - Failure-aware ingestion stages that mark the failed stage and block later stages visually.
-- Structured Reference catalog with searchable command, schema/output, and concept entries, source-basis labels, related-entry navigation, observed field lists, and copyable command/field text.
+- Structured Reference catalog with distinct JSON Schema and observed-data-artifact filters, first-class field detail routes, source provenance, related-entry navigation, history controls, and copyable definition metadata.
 - No server-side storage, upload service, or external data processing.
 
 The Overview page still contains a visibly marked synthetic profile. The Data Explorer uses real exported analysis values once a supported ACMM export ZIP is opened. Generated R plot images inside an export are inventoried but are not used by Explorer; frontend visualizations are rendered independently from the exported numeric tables. Raw execution-result folders are intentionally outside the viewer's scope.
@@ -35,7 +35,6 @@ The Overview page still contains a visibly marked synthetic profile. The Data Ex
 From the repository root:
 
 ```bash
-
 ./scripts/dev.sh
 ```
 
@@ -45,30 +44,66 @@ Then open:
 http://localhost:5173
 ```
 
-Stop the development service with `Ctrl+C`. The one-off development container is started with `--rm`, so Docker removes that container automatically when it exits. The named `node_modules` volume is intentionally retained between runs so dependencies do not need to be rebuilt from scratch.
+`dev.sh` performs the local startup jobs in order:
 
-The source tree is bind-mounted into the development container. `node_modules` is kept in a Docker named volume so frontend dependencies do not need to be installed into the host repository.
+1. If both sibling ACMM source repositories are available, regenerate the source-backed JSON Schema reference catalog.
+2. Ensure one shared local Explorer dev image exists; ordinary launches reuse it instead of rebuilding.
+3. Run the normal `docker compose up explorer` service lifecycle.
+4. Install/reconcile frontend dependencies inside the named `node_modules` volume.
+5. Launch Vite directly as the container foreground process.
 
-### Disposable development container
+Stop with `Ctrl+C`. The helper deliberately does not intercept SIGINT: Docker Compose owns the same shutdown path as the known-good manual `docker compose up` command. After Compose returns, an EXIT cleanup runs `docker compose down --remove-orphans`, removing the stopped Explorer service container and project network. The named `node_modules` volume is intentionally retained because cleanup does not use `-v`. Vite is executed directly rather than through `npm run dev`, so normal Ctrl+C shutdown is not routed through an npm script.
 
-The helper script is equivalent to:
+Normal startup does **not** rebuild the Docker image. Source is bind-mounted and frontend dependencies are reconciled at container startup, so repeatedly rebuilding only adds unnecessary registry access. Force a rebuild only when needed:
 
 ```bash
-docker compose run --rm --build --service-ports explorer
+./scripts/dev.sh --build
 ```
 
-`--service-ports` exposes the Vite port declared by the Compose service, and `--rm` removes the one-off container when the process exits. This is preferred over `docker compose up` for normal local use because stopped development containers are not retained.
+If an older Explorer Compose image already exists locally, the helper automatically retags and reuses it as `acmm-explorer-dev:local` on the first v0.18.2 launch. Both the Explorer and reference-import services share this one local image.
 
-### Reference source repository paths
+To start the site without refreshing the reference catalog:
 
-The future schema-reference importer is designed around the normal sibling-repository layout under `~/`. From the `acmm_explorer` repository root, the default source locations are therefore:
+```bash
+./scripts/dev.sh --skip-reference
+```
+
+### Source-generated schema reference
+
+The default sibling-repository layout under `~/` is:
+
+```text
+~/acmm_repo
+~/acmm_experiments
+~/acmm_explorer
+```
+
+From the Explorer repository root the defaults are therefore:
 
 ```text
 ../acmm_repo
 ../acmm_experiments
 ```
 
-`.env.example` records these defaults as `ACMM_CORE_REPO` and `ACMM_EXPERIMENTS_REPO`. Relative values are interpreted from the Explorer repository root; absolute paths will also be accepted when the importer is implemented. Source repositories will be mounted read-only for catalog generation and will not be required by the running browser application.
+`.env.example` documents those paths as `ACMM_CORE_REPO` and `ACMM_EXPERIMENTS_REPO`. Relative values are normalized lexically from the logical Explorer path before any symlink is followed; for the default WSL layout this yields `/home/<user>/acmm_repo` and `/home/<user>/acmm_experiments`. Absolute paths are also accepted.
+
+Generate the schema book explicitly with:
+
+```bash
+./scripts/reference-import.sh
+```
+
+The importer also reuses the shared local dev image. Use `./scripts/reference-import.sh --build` only when an explicit image rebuild is wanted.
+
+The helper resolves the source paths on the host, mounts both repositories read-only into a disposable `reference-import` container, discovers JSON Schema documents, resolves local/relative `$ref` targets where possible, and writes:
+
+```text
+src/reference/generated/schema-catalog.json
+```
+
+The generated catalog contains source-repository/commit provenance, schema file SHA-256 values, schema metadata, and searchable property records including nested object/array fields and fields declared inside `$defs` / `definitions`. The running website reads only the generated catalog; it does not require the Core or Experiments repositories at runtime.
+
+`./scripts/dev.sh` invokes the importer in `--if-available` mode. If either sibling repository is absent, startup continues with the last committed generated catalog.
 
 ## Optional host-native development
 
@@ -96,7 +131,7 @@ src/
   explorer/         experiment-data exploration UI
   decision/         decision-function model, presets, store, and expression evaluator
   workshop/         decision workshop UI
-  reference/        CLI/schema/concept reference UI
+  reference/        CLI/schema/concept reference UI and generated schema catalog
   visualization/    chart components and visualization primitives
 ```
 
@@ -187,3 +222,15 @@ The normalized Data Explorer now exposes four linked analysis views for the sele
 ## v0.17 reference catalog
 
 The Reference page is now a structured local catalog rather than placeholder cards. It separates three source bases: entries observed directly in the supplied analyzed export packages, project-context entries whose exhaustive frozen-source option/schema inventory is still pending, and Explorer-local concepts such as decision recipes. Observed CSV field lists are taken from the supplied Experiment 1 and Experiment 2 exports. Command entries intentionally avoid claiming an exhaustive option list until the frozen Core/experiment source repositories are imported. The catalog model lives in `src/reference/catalog.ts` so a future source importer can replace or enrich entries without coupling reference data to the React view.
+
+
+## v0.18 source-generated schema catalog
+
+The Reference database now has a generated source layer in addition to curated project-context and observed-export entries. `scripts/reference-import.mjs` recursively scans the read-only Core and Experiments source trees for JSON Schema documents while excluding build/cache/result directories. Each discovered schema becomes a searchable `Schema` entry and each property becomes a searchable `Field` entry. Field records preserve canonical instance/definition path, JSON pointer, type, required/conditional status, default/const/enum/format/constraints, `$ref`, source file, repository source, and schema/file provenance. Fields declared only inside `$defs` or legacy `definitions` are retained with definition-qualified paths so the schema book is not limited to fields observed in a specific experiment export.
+
+Generated source data and observed export data are intentionally separate: the generated schema book answers what the frozen source permits, while analyzed-export entries describe what was present in the supplied experiment output.
+
+## v0.19 reference navigation and field pages
+
+Reference entries now distinguish source-generated `JSON Schema` definitions from observed YAML/CSV `Data Artifact` structures. Every generated or observed field is a first-class searchable `Field` entry with its own `#/reference/<entry-id>` route. Schema/artifact field lists navigate by clicking the field row itself; the old `Open` action is removed. Reference navigation writes browser history entries and exposes Back, Forward, and Copy link controls so direct field links and related-entry traversal remain consistent. Observed fields retain their artifact provenance, while generated fields retain JSON Schema source/constraint provenance.
+

@@ -1,7 +1,59 @@
-import { useEffect, useMemo, useState, type ChangeEvent } from "react";
-import { referenceEntries, referenceEntryById, type ReferenceEntry, type ReferenceKind } from "./catalog";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { referenceEntries, referenceEntryById, schemaCatalogInfo, type ReferenceEntry, type ReferenceKind } from "./catalog";
 
-const kindOptions: Array<"All" | ReferenceKind> = ["All", "Command", "Schema", "Concept"];
+type ReferenceFilter = "All" | ReferenceKind;
+
+const filterOptions: Array<{ value: ReferenceFilter; label: string }> = [
+  { value: "All", label: "All" },
+  { value: "Command", label: "Command" },
+  { value: "Schema", label: "JSON Schema" },
+  { value: "Artifact", label: "Data Artifact" },
+  { value: "Field", label: "Field" },
+  { value: "Concept", label: "Concept" },
+];
+
+interface ReferenceHistoryMarker
+{
+  session: string;
+  index: number;
+  id: string;
+}
+
+interface ReferenceWindowState
+{
+  acmmReference?: ReferenceHistoryMarker;
+  [key: string]: unknown;
+}
+
+const referenceHashPrefix = "#/reference/";
+
+function referenceHash(id: string)
+{
+  return `${referenceHashPrefix}${encodeURIComponent(id)}`;
+}
+
+function referenceIdFromLocation()
+{
+  if (!window.location.hash.startsWith(referenceHashPrefix))
+  {
+    return null;
+  }
+
+  try
+  {
+    const id = decodeURIComponent(window.location.hash.slice(referenceHashPrefix.length));
+    return referenceEntryById.has(id) ? id : null;
+  }
+  catch
+  {
+    return null;
+  }
+}
+
+function initialReferenceId()
+{
+  return referenceIdFromLocation() ?? referenceEntries[0]?.id ?? "";
+}
 
 function matchesQuery(entry: ReferenceEntry, query: string)
 {
@@ -21,9 +73,32 @@ function matchesQuery(entry: ReferenceEntry, query: string)
     ...(entry.aliases ?? []),
     ...(entry.syntax ?? []),
     ...(entry.fields ?? []).flatMap((field) => [field.name, field.description ?? ""]),
+    ...(entry.metadata ?? []).flatMap((item) => [item.label, item.value]),
   ].join(" ").toLowerCase();
 
   return searchable.includes(normalized);
+}
+
+function displayKind(entry: ReferenceEntry)
+{
+  if (entry.kind === "Schema")
+  {
+    return "JSON Schema";
+  }
+  if (entry.kind === "Artifact")
+  {
+    return "Data Artifact";
+  }
+  return entry.kind;
+}
+
+function kindClass(entry: ReferenceEntry)
+{
+  if (entry.kind === "Artifact")
+  {
+    return "artifact";
+  }
+  return entry.kind.toLowerCase();
 }
 
 function sourceTone(entry: ReferenceEntry)
@@ -36,6 +111,10 @@ function sourceTone(entry: ReferenceEntry)
   {
     return "local";
   }
+  if (entry.sourceStatus === "generated-schema")
+  {
+    return "generated";
+  }
   return "context";
 }
 
@@ -46,30 +125,66 @@ async function copyText(value: string)
 
 export function ReferenceView()
 {
+  const initialId = useRef(initialReferenceId()).current;
+  const historySession = useRef(`reference-${Date.now()}-${Math.random().toString(36).slice(2)}`);
   const [query, setQuery] = useState("");
-  const [kind, setKind] = useState<"All" | ReferenceKind>("All");
-  const [selectedId, setSelectedId] = useState(referenceEntries[0]?.id ?? "");
+  const [kind, setKind] = useState<ReferenceFilter>("All");
+  const [selectedId, setSelectedId] = useState(initialId);
   const [copied, setCopied] = useState<string | null>(null);
+  const [historyIndex, setHistoryIndex] = useState(0);
+  const [historyMax, setHistoryMax] = useState(0);
 
   const filteredEntries = useMemo(() => referenceEntries.filter((entry) =>
     (kind === "All" || entry.kind === kind) && matchesQuery(entry, query)), [kind, query]);
 
-  const selectedEntry = referenceEntryById.get(selectedId) ?? filteredEntries[0] ?? referenceEntries[0];
+  const selectedEntry = referenceEntryById.get(selectedId) ?? referenceEntries[0];
 
   useEffect(() =>
   {
-    if (filteredEntries.length > 0 && !filteredEntries.some((entry) => entry.id === selectedId))
+    if (!initialId)
     {
-      setSelectedId(filteredEntries[0].id);
+      return undefined;
     }
-  }, [filteredEntries, selectedId]);
+
+    const currentState = (window.history.state ?? {}) as ReferenceWindowState;
+    const initialMarker: ReferenceHistoryMarker = {
+      session: historySession.current,
+      index: 0,
+      id: initialId,
+    };
+    window.history.replaceState(
+      { ...currentState, acmmReference: initialMarker },
+      "",
+      referenceHash(initialId),
+    );
+
+    const handlePopState = (event: PopStateEvent) =>
+    {
+      const routeId = referenceIdFromLocation();
+      if (!routeId)
+      {
+        return;
+      }
+
+      setSelectedId(routeId);
+      const marker = (event.state as ReferenceWindowState | null)?.acmmReference;
+      if (marker?.session === historySession.current)
+      {
+        setHistoryIndex(marker.index);
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [initialId]);
 
   const counts = useMemo(() => ({
     all: referenceEntries.length,
     commands: referenceEntries.filter((entry) => entry.kind === "Command").length,
     schemas: referenceEntries.filter((entry) => entry.kind === "Schema").length,
+    artifacts: referenceEntries.filter((entry) => entry.kind === "Artifact").length,
+    fields: referenceEntries.filter((entry) => entry.kind === "Field").length,
     concepts: referenceEntries.filter((entry) => entry.kind === "Concept").length,
-    observed: referenceEntries.filter((entry) => entry.sourceStatus === "observed-export").length,
   }), []);
 
   const handleCopy = async (label: string, value: string) =>
@@ -86,16 +201,41 @@ export function ReferenceView()
     }
   };
 
-  const selectRelated = (id: string) =>
+  const navigateToEntry = (id: string) =>
   {
     const entry = referenceEntryById.get(id);
-    if (!entry)
+    if (!entry || id === selectedId)
     {
       return;
     }
-    setQuery("");
-    setKind("All");
+
+    const nextIndex = historyIndex + 1;
+    const state = (window.history.state ?? {}) as ReferenceWindowState;
+    window.history.pushState(
+      {
+        ...state,
+        acmmReference: {
+          session: historySession.current,
+          index: nextIndex,
+          id,
+        },
+      },
+      "",
+      referenceHash(id),
+    );
     setSelectedId(id);
+    setHistoryIndex(nextIndex);
+    setHistoryMax(nextIndex);
+  };
+
+  const copyCurrentLink = async () =>
+  {
+    if (!selectedEntry)
+    {
+      return;
+    }
+    const link = `${window.location.origin}${window.location.pathname}${window.location.search}${referenceHash(selectedEntry.id)}`;
+    await handleCopy("reference-link", link);
   };
 
   return (
@@ -106,18 +246,38 @@ export function ReferenceView()
           <h1>ACMM lookup.</h1>
         </div>
         <p>
-          Search project commands, analyzed export schemas, and working concepts. Entries derived
-          from observed exports are separated from project-context notes while frozen-source schema
-          harvesting remains pending.
+          Search commands, source-derived JSON Schema definitions and fields, observed data artifacts,
+          and working concepts. Each entry has its own addressable detail route; Back and Forward preserve
+          reference navigation without mixing generated schema definitions with observed CSV/YAML structures.
         </p>
       </section>
 
       <section className="reference-summary-grid" aria-label="Reference catalog summary">
         <div><span>Entries</span><strong>{counts.all}</strong></div>
         <div><span>Commands</span><strong>{counts.commands}</strong></div>
-        <div><span>Schemas</span><strong>{counts.schemas}</strong></div>
+        <div><span>JSON Schemas</span><strong>{counts.schemas}</strong></div>
+        <div><span>Artifacts</span><strong>{counts.artifacts}</strong></div>
+        <div><span>Fields</span><strong>{counts.fields}</strong></div>
         <div><span>Concepts</span><strong>{counts.concepts}</strong></div>
-        <div><span>Observed export</span><strong>{counts.observed}</strong></div>
+      </section>
+
+      <section className="reference-catalog-provenance" aria-label="Generated schema catalog status">
+        <div>
+          <span className="eyebrow">Source-generated schema catalog</span>
+          <strong>{schemaCatalogInfo.schemaCount} schemas / {schemaCatalogInfo.fieldCount} fields</strong>
+          <small>{schemaCatalogInfo.generatedAt ? `Generated ${new Date(schemaCatalogInfo.generatedAt).toLocaleString()}` : "No source catalog generated in this checkout yet."}</small>
+        </div>
+        <div className="reference-source-chips">
+          {schemaCatalogInfo.sources.length > 0 ? schemaCatalogInfo.sources.map((source) => (
+            <span key={source.id}>
+              <strong>{source.label}</strong>
+              <code>{source.commit ? source.commit.slice(0, 12) : "commit unavailable"}</code>
+              <small>{source.schemaCount} schemas / {source.fieldCount} fields</small>
+            </span>
+          )) : (
+            <span><small>Run <code>./scripts/reference-import.sh</code> with the sibling source repositories available.</small></span>
+          )}
+        </div>
       </section>
 
       <section className="reference-shell reference-workspace">
@@ -135,14 +295,14 @@ export function ReferenceView()
           </div>
 
           <div className="reference-kind-filter" aria-label="Reference kind filter">
-            {kindOptions.map((option) => (
+            {filterOptions.map((option) => (
               <button
-                className={`filter-chip ${kind === option ? "active" : ""}`}
-                key={option}
+                className={`filter-chip ${kind === option.value ? "active" : ""}`}
+                key={option.value}
                 type="button"
-                onClick={() => setKind(option)}
+                onClick={() => setKind(option.value)}
               >
-                {option}
+                {option.label}
               </button>
             ))}
           </div>
@@ -158,9 +318,9 @@ export function ReferenceView()
                 className={`reference-entry reference-entry-button ${selectedEntry?.id === entry.id ? "selected" : ""}`}
                 key={entry.id}
                 type="button"
-                onClick={() => setSelectedId(entry.id)}
+                onClick={() => navigateToEntry(entry.id)}
               >
-                <span className={`kind-badge kind-${entry.kind.toLowerCase()}`}>{entry.kind}</span>
+                <span className={`kind-badge kind-${kindClass(entry)}`}>{displayKind(entry)}</span>
                 <span className="reference-entry-copy">
                   <strong>{entry.name}</strong>
                   <small>{entry.summary}</small>
@@ -179,10 +339,20 @@ export function ReferenceView()
 
         {selectedEntry && (
           <article className="reference-detail" aria-live="polite">
+            <div className="reference-detail-nav" aria-label="Reference history">
+              <div>
+                <button type="button" disabled={historyIndex <= 0} onClick={() => window.history.back()}>Back</button>
+                <button type="button" disabled={historyIndex >= historyMax} onClick={() => window.history.forward()}>Forward</button>
+              </div>
+              <button type="button" onClick={() => void copyCurrentLink()}>
+                {copied === "reference-link" ? "Link copied" : "Copy link"}
+              </button>
+            </div>
+
             <div className="reference-detail-heading">
               <div>
                 <div className="reference-detail-badges">
-                  <span className={`kind-badge kind-${selectedEntry.kind.toLowerCase()}`}>{selectedEntry.kind}</span>
+                  <span className={`kind-badge kind-${kindClass(selectedEntry)}`}>{displayKind(selectedEntry)}</span>
                   <span className={`source-badge source-${sourceTone(selectedEntry)}`}>{selectedEntry.sourceLabel}</span>
                 </div>
                 <h2>{selectedEntry.name}</h2>
@@ -216,7 +386,26 @@ export function ReferenceView()
                   {selectedEntry.syntax.map((line) => (
                     <div className="reference-code-row" key={line}>
                       <code>{line}</code>
-                      <button type="button" onClick={() => handleCopy(line, line)}>{copied === line ? "Copied" : "Copy"}</button>
+                      <button type="button" onClick={() => void handleCopy(line, line)}>{copied === line ? "Copied" : "Copy"}</button>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {selectedEntry.metadata && selectedEntry.metadata.length > 0 && (
+              <section className="reference-detail-section">
+                <h3>Definition</h3>
+                <div className="reference-metadata-grid">
+                  {selectedEntry.metadata.map((item) => (
+                    <div key={`${item.label}:${item.value}`}>
+                      <span>{item.label}</span>
+                      <div>
+                        <code>{item.value}</code>
+                        <button type="button" onClick={() => void handleCopy(`${item.label}:${item.value}`, item.value)}>
+                          {copied === `${item.label}:${item.value}` ? "Copied" : "Copy"}
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -226,16 +415,31 @@ export function ReferenceView()
             {selectedEntry.fields && selectedEntry.fields.length > 0 && (
               <section className="reference-detail-section">
                 <div className="reference-section-heading">
-                  <h3>Observed fields</h3>
+                  <h3>{selectedEntry.kind === "Schema" ? "Schema fields" : "Observed fields"}</h3>
                   <span>{selectedEntry.fields.length}</span>
                 </div>
                 <div className="reference-field-list">
                   {selectedEntry.fields.map((field) => (
-                    <div className="reference-field-row" key={field.name}>
-                      <button type="button" onClick={() => handleCopy(field.name, field.name)}>
-                        <code>{field.name}</code>
+                    <div className="reference-field-row" key={`${field.name}:${field.entryId ?? "copy"}`}>
+                      {field.entryId ? (
+                        <button className="reference-field-link" type="button" onClick={() => navigateToEntry(field.entryId!)}>
+                          <code>{field.name}</code>
+                          <span>{field.description ?? "Open field details."}</span>
+                        </button>
+                      ) : (
+                        <div className="reference-field-link reference-field-link-static">
+                          <code>{field.name}</code>
+                          <span>{field.description ?? "Field recorded by this reference entry."}</span>
+                        </div>
+                      )}
+                      <button
+                        className="reference-field-copy"
+                        type="button"
+                        title={`Copy ${field.name}`}
+                        onClick={() => void handleCopy(`field:${field.name}`, field.name)}
+                      >
+                        {copied === `field:${field.name}` ? "Copied" : "Copy"}
                       </button>
-                      <span>{field.description ?? "Observed field; detailed frozen-schema definition pending source import."}</span>
                     </div>
                   ))}
                 </div>
@@ -263,8 +467,8 @@ export function ReferenceView()
                       return null;
                     }
                     return (
-                      <button type="button" key={id} onClick={() => selectRelated(id)}>
-                        <span className={`kind-badge kind-${related.kind.toLowerCase()}`}>{related.kind}</span>
+                      <button type="button" key={id} onClick={() => navigateToEntry(id)}>
+                        <span className={`kind-badge kind-${kindClass(related)}`}>{displayKind(related)}</span>
                         {related.name}
                       </button>
                     );

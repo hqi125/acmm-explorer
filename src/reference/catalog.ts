@@ -1,10 +1,19 @@
-export type ReferenceKind = "Command" | "Schema" | "Concept";
-export type ReferenceSourceStatus = "observed-export" | "project-context" | "explorer-local";
+import generatedSchemaCatalog from "./generated/schema-catalog.json";
+
+export type ReferenceKind = "Command" | "Schema" | "Artifact" | "Field" | "Concept";
+export type ReferenceSourceStatus = "observed-export" | "project-context" | "explorer-local" | "generated-schema";
 
 export interface ReferenceField
 {
   name: string;
   description?: string;
+  entryId?: string;
+}
+
+export interface ReferenceMetadata
+{
+  label: string;
+  value: string;
 }
 
 export interface ReferenceEntry
@@ -23,6 +32,7 @@ export interface ReferenceEntry
   examples?: string[];
   fields?: ReferenceField[];
   notes?: string[];
+  metadata?: ReferenceMetadata[];
   related?: string[];
 }
 
@@ -30,7 +40,7 @@ const observedBoth = "Observed in both supplied analyzed export packages (legacy
 const observedCurrent = "Observed in the supplied current campaign export analysis output. Older Experiment 1 analysis output does not contain this trajectory table.";
 const projectContext = "Project-context entry. Exact exhaustive option/schema documentation remains intentionally deferred until the frozen source repositories are imported into the reference generator.";
 
-export const referenceEntries: ReferenceEntry[] = [
+const curatedReferenceEntries: ReferenceEntry[] = [
   {
     id: "command-acmm-run",
     kind: "Command",
@@ -271,7 +281,7 @@ export const referenceEntries: ReferenceEntry[] = [
   },
   {
     id: "schema-export-manifest",
-    kind: "Schema",
+    kind: "Artifact",
     name: "export_manifest.yaml",
     summary: "Top-level export manifest describing export schema version, provenance, and exported tables.",
     sourceStatus: "observed-export",
@@ -289,7 +299,7 @@ export const referenceEntries: ReferenceEntry[] = [
   },
   {
     id: "schema-analysis-manifest",
-    kind: "Schema",
+    kind: "Artifact",
     name: "analysis_manifest.yaml",
     summary: "Manifest for one versioned analysis snapshot in the current campaign export layout.",
     sourceStatus: "observed-export",
@@ -310,7 +320,7 @@ export const referenceEntries: ReferenceEntry[] = [
   },
   {
     id: "schema-analysis-plan",
-    kind: "Schema",
+    kind: "Artifact",
     name: "analysis_plan.yaml",
     summary: "Requested analysis configuration associated with one analysis snapshot.",
     sourceStatus: "observed-export",
@@ -322,7 +332,7 @@ export const referenceEntries: ReferenceEntry[] = [
   },
   {
     id: "schema-dimension-scores",
-    kind: "Schema",
+    kind: "Artifact",
     name: "dimension_scores.csv",
     summary: "Canonical dimension-score table used by Explorer to render GOBPFR point-estimate profiles.",
     sourceStatus: "observed-export",
@@ -339,7 +349,7 @@ export const referenceEntries: ReferenceEntry[] = [
   },
   {
     id: "schema-dimension-intervals",
-    kind: "Schema",
+    kind: "Artifact",
     name: "dimension_intervals.csv",
     summary: "Dimension score table with confidence-interval metadata and lower/upper bounds.",
     sourceStatus: "observed-export",
@@ -357,7 +367,7 @@ export const referenceEntries: ReferenceEntry[] = [
   },
   {
     id: "schema-requirement-estimates",
-    kind: "Schema",
+    kind: "Artifact",
     name: "requirement_estimates.csv",
     summary: "Requirement-level compliance estimates and coverage counts used by the Requirements detail view.",
     sourceStatus: "observed-export",
@@ -375,7 +385,7 @@ export const referenceEntries: ReferenceEntry[] = [
   },
   {
     id: "schema-requirement-intervals",
-    kind: "Schema",
+    kind: "Artifact",
     name: "requirement_intervals.csv",
     summary: "Requirement estimates plus confidence intervals for compliance and coverage.",
     sourceStatus: "observed-export",
@@ -397,7 +407,7 @@ export const referenceEntries: ReferenceEntry[] = [
   },
   {
     id: "schema-availability-summary",
-    kind: "Schema",
+    kind: "Artifact",
     name: "availability_summary.csv",
     summary: "Subject/scope availability totals including first-attempt validity and retry recovery.",
     sourceStatus: "observed-export",
@@ -414,7 +424,7 @@ export const referenceEntries: ReferenceEntry[] = [
   },
   {
     id: "schema-availability-cells",
-    kind: "Schema",
+    kind: "Artifact",
     name: "availability_cells.csv",
     summary: "Scenario-by-subject availability cells used by the detailed Availability view.",
     sourceStatus: "observed-export",
@@ -430,7 +440,7 @@ export const referenceEntries: ReferenceEntry[] = [
   },
   {
     id: "schema-trajectory-subject",
-    kind: "Schema",
+    kind: "Artifact",
     name: "trajectory_subject_summary.csv",
     summary: "Per-subject tool-trajectory summary available in the newer Experiment 2 analysis output.",
     sourceStatus: "observed-export",
@@ -447,7 +457,7 @@ export const referenceEntries: ReferenceEntry[] = [
   },
   {
     id: "schema-trajectory-tool",
-    kind: "Schema",
+    kind: "Artifact",
     name: "trajectory_tool_usage.csv",
     summary: "Per-subject, per-tool usage counts and result error rates.",
     sourceStatus: "observed-export",
@@ -462,7 +472,7 @@ export const referenceEntries: ReferenceEntry[] = [
   },
   {
     id: "schema-trajectory-run",
-    kind: "Schema",
+    kind: "Artifact",
     name: "trajectory_run_metrics.csv",
     summary: "Run-level trajectory metrics used for tool-call scatter and detailed run inspection.",
     sourceStatus: "observed-export",
@@ -477,6 +487,229 @@ export const referenceEntries: ReferenceEntry[] = [
     ],
     related: ["schema-trajectory-subject", "schema-trajectory-tool"],
   },
+];
+
+
+interface GeneratedCatalogSource
+{
+  id: string;
+  label: string;
+  commit: string | null;
+  schemaCount: number;
+  fieldCount: number;
+}
+
+interface GeneratedCatalogSchema
+{
+  id: string;
+  sourceId: string;
+  sourceLabel: string;
+  relativePath: string;
+  title: string;
+  description: string | null;
+  schemaUri: string | null;
+  schemaId: string | null;
+  types: string[];
+  fileSha256: string;
+  fieldCount: number;
+  definitionCount: number;
+}
+
+interface GeneratedCatalogField
+{
+  id: string;
+  schemaId: string;
+  sourceId: string;
+  sourceLabel: string;
+  sourceRelativePath: string;
+  name: string;
+  path: string;
+  pointer: string;
+  title: string | null;
+  description: string | null;
+  types: string[];
+  required: boolean;
+  conditional: boolean;
+  default?: unknown;
+  enum: unknown[] | null;
+  const?: unknown;
+  format: string | null;
+  ref: string | null;
+  constraints: Record<string, unknown>;
+}
+
+interface GeneratedCatalog
+{
+  schemaVersion: string;
+  generatedAt: string | null;
+  sources: GeneratedCatalogSource[];
+  schemas: GeneratedCatalogSchema[];
+  fields: GeneratedCatalogField[];
+}
+
+const generatedCatalog = generatedSchemaCatalog as GeneratedCatalog;
+const generatedSchemaEntryId = (schemaId: string) => `generated-schema:${schemaId}`;
+const generatedFieldEntryId = (fieldId: string) => `generated-field:${fieldId}`;
+
+function displayValue(value: unknown)
+{
+  if (typeof value === "string")
+  {
+    return value;
+  }
+  const serialized = JSON.stringify(value);
+  return serialized ?? String(value);
+}
+
+function generatedSourceNote(sourceId: string)
+{
+  const source = generatedCatalog.sources.find((candidate) => candidate.id === sourceId);
+  if (!source)
+  {
+    return "Generated from a read-only ACMM source repository by the local reference importer.";
+  }
+  const commit = source.commit ? source.commit : "commit unavailable";
+  return `Generated from the read-only ${source.label} repository at ${commit}.`;
+}
+
+const fieldsBySchema = new Map<string, GeneratedCatalogField[]>();
+for (const field of generatedCatalog.fields)
+{
+  const list = fieldsBySchema.get(field.schemaId) ?? [];
+  list.push(field);
+  fieldsBySchema.set(field.schemaId, list);
+}
+
+const generatedSchemaEntries: ReferenceEntry[] = generatedCatalog.schemas.map((schema) =>
+{
+  const fields = fieldsBySchema.get(schema.id) ?? [];
+  return {
+    id: generatedSchemaEntryId(schema.id),
+    kind: "Schema",
+    name: schema.title,
+    summary: schema.description ?? `JSON Schema imported from ${schema.sourceLabel}: ${schema.relativePath}`,
+    sourceStatus: "generated-schema",
+    sourceLabel: `${schema.sourceLabel} schema`,
+    sourceNote: generatedSourceNote(schema.sourceId),
+    aliases: [schema.relativePath, schema.schemaId ?? "", schema.fileSha256].filter((value) => value.length > 0),
+    fields: fields.map((field) => ({
+      name: field.path,
+      description: field.description ?? `${field.types.length > 0 ? field.types.join(" | ") : "schema field"}${field.required ? "; required" : ""}`,
+      entryId: generatedFieldEntryId(field.id),
+    })),
+    metadata: [
+      { label: "Source repository", value: schema.sourceLabel },
+      { label: "Source file", value: schema.relativePath },
+      ...(schema.schemaId ? [{ label: "Schema $id", value: schema.schemaId }] : []),
+      ...(schema.schemaUri ? [{ label: "JSON Schema dialect", value: schema.schemaUri }] : []),
+      { label: "Fields", value: String(schema.fieldCount) },
+      { label: "Definitions", value: String(schema.definitionCount) },
+      { label: "File SHA-256", value: schema.fileSha256 },
+    ],
+  };
+});
+
+const generatedFieldEntries: ReferenceEntry[] = generatedCatalog.fields.map((field) =>
+{
+  const schema = generatedCatalog.schemas.find((candidate) => candidate.id === field.schemaId);
+  const requiredLabel = field.conditional ? "Conditional" : field.required ? "Yes" : "No";
+  const metadata: ReferenceMetadata[] = [
+    { label: "Canonical path", value: field.path },
+    { label: "Type", value: field.types.length > 0 ? field.types.join(" | ") : "unspecified" },
+    { label: "Required", value: requiredLabel },
+    { label: "JSON pointer", value: field.pointer },
+    { label: "Source file", value: field.sourceRelativePath },
+  ];
+
+  if (field.default !== undefined)
+  {
+    metadata.push({ label: "Default", value: displayValue(field.default) });
+  }
+  if (field.const !== undefined)
+  {
+    metadata.push({ label: "Const", value: displayValue(field.const) });
+  }
+  if (field.enum && field.enum.length > 0)
+  {
+    metadata.push({ label: "Allowed values", value: field.enum.map(displayValue).join(", ") });
+  }
+  if (field.format)
+  {
+    metadata.push({ label: "Format", value: field.format });
+  }
+  if (field.ref)
+  {
+    metadata.push({ label: "$ref", value: field.ref });
+  }
+  for (const [key, value] of Object.entries(field.constraints))
+  {
+    metadata.push({ label: key, value: displayValue(value) });
+  }
+
+  return {
+    id: generatedFieldEntryId(field.id),
+    kind: "Field",
+    name: field.path,
+    summary: field.description ?? field.title ?? `Field defined by ${schema?.title ?? field.schemaId}.`,
+    sourceStatus: "generated-schema",
+    sourceLabel: `${field.sourceLabel} field`,
+    sourceNote: generatedSourceNote(field.sourceId),
+    aliases: [field.name, field.path, field.pointer, field.sourceRelativePath, schema?.title ?? ""].filter((value) => value.length > 0),
+    metadata,
+    related: [generatedSchemaEntryId(field.schemaId)],
+  };
+});
+
+export const schemaCatalogInfo = {
+  schemaVersion: generatedCatalog.schemaVersion,
+  generatedAt: generatedCatalog.generatedAt,
+  sources: generatedCatalog.sources,
+  schemaCount: generatedCatalog.schemas.length,
+  fieldCount: generatedCatalog.fields.length,
+};
+
+function observedFieldEntryId(parentId: string, index: number)
+{
+  return `observed-field:${parentId}:${index}`;
+}
+
+const observedFieldEntries: ReferenceEntry[] = [];
+const curatedEntriesWithFieldLinks: ReferenceEntry[] = curatedReferenceEntries.map((entry) =>
+{
+  if (entry.kind !== "Artifact" || !entry.fields || entry.fields.length === 0)
+  {
+    return entry;
+  }
+
+  const linkedFields = entry.fields.map((field, index) =>
+  {
+    const fieldId = observedFieldEntryId(entry.id, index);
+    observedFieldEntries.push({
+      id: fieldId,
+      kind: "Field",
+      name: field.name,
+      summary: field.description ?? `Observed field in ${entry.name}.`,
+      sourceStatus: entry.sourceStatus,
+      sourceLabel: `${entry.sourceLabel} field`,
+      sourceNote: entry.sourceNote,
+      aliases: [field.name, entry.name, ...(entry.aliases ?? [])],
+      metadata: [
+        { label: "Field", value: field.name },
+        { label: "Observed artifact", value: entry.name },
+      ],
+      related: [entry.id],
+    });
+    return { ...field, entryId: fieldId };
+  });
+
+  return { ...entry, fields: linkedFields };
+});
+
+export const referenceEntries: ReferenceEntry[] = [
+  ...curatedEntriesWithFieldLinks,
+  ...observedFieldEntries,
+  ...generatedSchemaEntries,
+  ...generatedFieldEntries,
 ];
 
 export const referenceEntryById = new Map(referenceEntries.map((entry) => [entry.id, entry]));
