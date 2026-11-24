@@ -1,5 +1,6 @@
 import type {
   DecisionEligibilityRule,
+  DecisionEvidenceMode,
   DecisionFunctionDefinition,
   DecisionParameterControl,
   DecisionParameterDefinition,
@@ -8,8 +9,12 @@ import type {
 } from "./model";
 import { createCustomDecisionFunction } from "./store";
 
-export const decisionRecipeSchema = "acmm-explorer-decision-recipe/0.2";
-const legacyDecisionRecipeSchema = "acmm-explorer-decision-recipe/0.1";
+export const decisionRecipeSchema = "acmm-explorer-decision-recipe/0.3";
+const supportedSchemas = new Set([
+  decisionRecipeSchema,
+  "acmm-explorer-decision-recipe/0.2",
+  "acmm-explorer-decision-recipe/0.1",
+]);
 
 interface DecisionRecipeFile
 {
@@ -19,6 +24,7 @@ interface DecisionRecipeFile
     name: string;
     description: string;
     category: string;
+    evidenceMode?: DecisionEvidenceMode;
     expression: string;
     parameterGroups?: DecisionParameterGroupDefinition[];
     parameters: DecisionParameterDefinition[];
@@ -99,7 +105,7 @@ function readRules(value: unknown): DecisionEligibilityRule[]
   {
     throw new Error("Recipe eligibilityRules must be an array.");
   }
-  const dimensions = new Set(["goal", "obligation", "boundary", "procedure", "fidelity", "recovery"]);
+  const metrics = new Set(["goal", "obligation", "boundary", "procedure", "fidelity", "recovery", "availability"]);
   const operators = new Set([">=", ">", "<=", "<"]);
 
   return value.map((item, index) =>
@@ -108,10 +114,15 @@ function readRules(value: unknown): DecisionEligibilityRule[]
     {
       throw new Error(`Eligibility rule ${index + 1} is not an object.`);
     }
-    const candidate = item as Partial<DecisionEligibilityRule>;
+    const candidate = item as Partial<DecisionEligibilityRule> & { dimension?: unknown };
+    const metric = typeof candidate.metric === "string"
+      ? candidate.metric
+      : typeof candidate.dimension === "string"
+        ? candidate.dimension
+        : null;
     if (typeof candidate.id !== "string"
-      || typeof candidate.dimension !== "string"
-      || !dimensions.has(candidate.dimension)
+      || metric === null
+      || !metrics.has(metric)
       || typeof candidate.operator !== "string"
       || !operators.has(candidate.operator)
       || typeof candidate.threshold !== "number"
@@ -119,8 +130,18 @@ function readRules(value: unknown): DecisionEligibilityRule[]
     {
       throw new Error(`Eligibility rule ${index + 1} is invalid.`);
     }
-    return candidate as DecisionEligibilityRule;
+    return {
+      id: candidate.id,
+      metric: metric as DecisionEligibilityRule["metric"],
+      operator: candidate.operator as DecisionEligibilityRule["operator"],
+      threshold: candidate.threshold,
+    };
   });
+}
+
+function readEvidenceMode(value: unknown): DecisionEvidenceMode
+{
+  return value === "lower-confidence-bound" ? "lower-confidence-bound" : "point-estimate";
 }
 
 export function serializeDecisionRecipe(definition: DecisionFunctionDefinition): string
@@ -132,6 +153,7 @@ export function serializeDecisionRecipe(definition: DecisionFunctionDefinition):
       name: definition.name,
       description: definition.description,
       category: definition.category,
+      evidenceMode: definition.evidenceMode,
       expression: definition.expression,
       parameterGroups: definition.parameterGroups.map((item) => ({ ...item })),
       parameters: definition.parameters.map((item) => ({ ...item })),
@@ -158,7 +180,7 @@ export function parseDecisionRecipe(text: string): DecisionFunctionDefinition
     throw new Error("The selected file is not a decision recipe object.");
   }
   const file = parsed as Partial<DecisionRecipeFile>;
-  if (file.schema !== decisionRecipeSchema && file.schema !== legacyDecisionRecipeSchema)
+  if (typeof file.schema !== "string" || !supportedSchemas.has(file.schema))
   {
     throw new Error(`Unsupported decision recipe schema '${String(file.schema ?? "missing")}'.`);
   }
@@ -188,6 +210,7 @@ export function parseDecisionRecipe(text: string): DecisionFunctionDefinition
     name: recipe.name.trim().length > 0 ? `${recipe.name} import` : "Imported decision function",
     description: recipe.description,
     category: typeof recipe.category === "string" && recipe.category.trim().length > 0 ? recipe.category : "Imported",
+    evidenceMode: readEvidenceMode(recipe.evidenceMode),
     expression: recipe.expression,
     parameterGroups,
     parameters,

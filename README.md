@@ -21,9 +21,9 @@ The project now includes ACMM-aware export viewing plus a reusable Decision Work
 - Availability summaries and trajectory summaries when those analysis tables are present.
 - Source links from profile rows back to the exact exported analysis table.
 - Paginated file inventory with filename search and file-type filtering.
-- Decision Workshop with a persisted local function store, categorized presets, a bounded expression evaluator, merged canonical radar, conditional cross-agent ranking, normalized parameter groups, and saved-parameter sensitivity sweeps.
+- Decision Workshop with a persisted local function store, categorized presets, a bounded expression evaluator, merged canonical radar, conditional cross-agent ranking, normalized parameter groups, uncertainty-aware evidence selection, availability-aware eligibility rules, and saved-parameter sensitivity sweeps.
 - Recipe-defined parameter controls with optional min/max/step metadata, procedural number/slider rendering, and optional parameter-group transforms such as sum-to-one normalization.
-- Versioned local decision-recipe JSON import/export (`acmm-explorer-decision-recipe/0.2`), with backward-compatible import of `0.1` recipes.
+- Versioned local decision-recipe JSON import/export (`acmm-explorer-decision-recipe/0.3`), with backward-compatible import of `0.1` and `0.2` recipes.
 - Failure-aware ingestion stages that mark the failed stage and block later stages visually.
 - Reference-search shell for future generated CLI/schema documentation.
 - No server-side storage, upload service, or external data processing.
@@ -137,12 +137,23 @@ The Decision Workshop keeps canonical ACMM evidence separate from user-defined p
 - Presets are read-only and can be duplicated into custom functions.
 - Parameter rows are generated from each recipe's declared parameter definitions; they are not hard-coded to a specific preset.
 - Parameters may declare `min`, `max`, `step`, and `control` metadata. Slider controls are rendered only from that stored metadata; unknown expression identifiers still fail validation.
-- Built-in presets are grouped by purpose (`Basic`, `Weighted`, `Constrained`) in the function selector.
+- Built-in presets are grouped by purpose (`Basic`, `Weighted`, `Constrained`, `Risk-aware`) in the function selector.
 - The expression parser resolves declared parameter symbols. Unknown identifiers fail validation rather than silently creating new parameters.
 - Parameter and eligibility-rule lists use bounded inline scroll regions so large recipes do not make the page grow without limit.
-- Eligibility rules are evaluated separately from the score and cannot be compensated by a high score on another dimension.
+- Each recipe explicitly selects its decision evidence basis: exported point estimates or lower confidence bounds. The canonical radar always remains on point estimates.
+- Eligibility rules are evaluated separately from the score and cannot be compensated by a high score on another dimension. Dimension rules use the recipe evidence basis; availability rules use the exported analysis availability metric.
 - The score comparison chart renders raw function output for eligible agents only; it does not normalize scores into percentages.
 - Saved functions can be exported as versioned recipe JSON. Import validates the recipe and stores it as a new custom function rather than overwriting an existing entry.
 - Bounded parameters (explicit `min` and `max`) can be inspected with a one-parameter sensitivity sweep. The sweep samples the saved raw parameter at 41 points while all other raw parameters remain fixed, reapplies parameter-group normalization at each sample, and does not modify the recipe.
 - Sensitivity results detect approximate pairwise score crossings and report where the ordering changes as the selected parameter increases.
 - The top summary uses three columns on wide screens, two columns at intermediate widths, and one column on narrow screens. The full editor and sensitivity tools remain vertically stacked beneath it.
+
+
+### Decision evidence and uncertainty
+
+Decision recipes choose how the six GOBPFR variables are populated before the expression is evaluated:
+
+- `point-estimate`: use each exported dimension score. This remains the default for existing recipes.
+- `lower-confidence-bound`: use each exported dimension interval lower bound. If a required lower bound is unavailable, that subject is reported as unavailable for the decision rather than silently falling back to the point estimate.
+
+The selected evidence basis also applies to dimension-based eligibility rules. Availability is deliberately separate from GOBPFR and can be used only as an eligibility metric; it is not introduced as a seventh compliance dimension. The sensitivity sweep uses the same saved evidence basis as the active recipe.

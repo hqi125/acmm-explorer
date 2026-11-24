@@ -13,7 +13,9 @@ import {
 } from "../decision/expression";
 import type {
   DecisionDimension,
+  DecisionEligibilityMetric,
   DecisionEligibilityRule,
+  DecisionEvidenceMode,
   DecisionEvaluation,
   DecisionFunctionDefinition,
   DecisionParameterControl,
@@ -49,11 +51,24 @@ const dimensionLabels: Record<DecisionDimension, string> = {
   recovery: "Recovery",
 };
 
+const eligibilityMetricLabels: Record<DecisionEligibilityMetric, string> = {
+  ...dimensionLabels,
+  availability: "Availability",
+};
+
+const evidenceModeLabels: Record<DecisionEvidenceMode, string> = {
+  "point-estimate": "Point estimate",
+  "lower-confidence-bound": "Lower confidence bound",
+};
+
 const eligibilityOperators: EligibilityOperator[] = [">=", ">", "<=", "<"];
 
-function profileVariables(profile: AgentProfile): DecisionVariables | null
+function profileVariables(profile: AgentProfile, evidenceMode: DecisionEvidenceMode): DecisionVariables | null
 {
-  const values = new Map(profile.dimensions.map((item) => [item.dimension, item.score]));
+  const values = new Map(profile.dimensions.map((item) => [
+    item.dimension,
+    evidenceMode === "lower-confidence-bound" ? item.lower : item.score,
+  ]));
   const result = {} as DecisionVariables;
   for (const dimension of complianceDimensions)
   {
@@ -76,9 +91,13 @@ function formatParameterValue(value: number): string
   return Number(value.toFixed(6)).toString();
 }
 
-function rulePasses(rule: DecisionEligibilityRule, variables: DecisionVariables): boolean
+function rulePasses(rule: DecisionEligibilityRule, profile: AgentProfile, variables: DecisionVariables): boolean | null
 {
-  const value = variables[rule.dimension];
+  const value = rule.metric === "availability" ? profile.availability : variables[rule.metric];
+  if (value === null)
+  {
+    return null;
+  }
   switch (rule.operator)
   {
     case ">=":
@@ -94,7 +113,7 @@ function rulePasses(rule: DecisionEligibilityRule, variables: DecisionVariables)
 
 function describeRule(rule: DecisionEligibilityRule): string
 {
-  return `${dimensionLabels[rule.dimension]} ${rule.operator} ${rule.threshold}`;
+  return `${eligibilityMetricLabels[rule.metric]} ${rule.operator} ${rule.threshold}`;
 }
 
 function evaluateProfiles(analysis: AnalysisSnapshot, definition: DecisionFunctionDefinition): DecisionEvaluation[]
@@ -102,7 +121,7 @@ function evaluateProfiles(analysis: AnalysisSnapshot, definition: DecisionFuncti
   const parameters = effectiveDecisionParameters(definition);
   return analysis.profiles.map((profile) =>
   {
-    const variables = profileVariables(profile);
+    const variables = profileVariables(profile, definition.evidenceMode);
     if (variables === null)
     {
       return {
@@ -110,12 +129,28 @@ function evaluateProfiles(analysis: AnalysisSnapshot, definition: DecisionFuncti
         value: null,
         eligible: null,
         failedRules: [],
-        error: "One or more compliance dimensions are unavailable.",
+        error: definition.evidenceMode === "lower-confidence-bound"
+          ? "One or more lower confidence bounds are unavailable."
+          : "One or more compliance dimensions are unavailable.",
+      };
+    }
+
+    const unavailableRules = definition.eligibilityRules
+      .filter((rule) => rulePasses(rule, profile, variables) === null)
+      .map(describeRule);
+    if (unavailableRules.length > 0)
+    {
+      return {
+        subjectId: profile.subjectId,
+        value: null,
+        eligible: null,
+        failedRules: [],
+        error: `Eligibility data unavailable for: ${unavailableRules.join("; ")}.`,
       };
     }
 
     const failedRules = definition.eligibilityRules
-      .filter((rule) => !rulePasses(rule, variables))
+      .filter((rule) => rulePasses(rule, profile, variables) === false)
       .map(describeRule);
 
     try
@@ -181,8 +216,8 @@ function evaluateSensitivity(
 
   return analysis.profiles.flatMap((profile): DecisionSensitivitySeries[] =>
   {
-    const variables = profileVariables(profile);
-    if (variables === null || definition.eligibilityRules.some((rule) => !rulePasses(rule, variables)))
+    const variables = profileVariables(profile, definition.evidenceMode);
+    if (variables === null || definition.eligibilityRules.some((rule) => rulePasses(rule, profile, variables) !== true))
     {
       return [];
     }
@@ -317,7 +352,7 @@ function validateRecipe(definition: DecisionFunctionDefinition): string | null
   {
     if (!Number.isFinite(rule.threshold))
     {
-      return `${dimensionLabels[rule.dimension]} eligibility threshold must be finite.`;
+      return `${eligibilityMetricLabels[rule.metric]} eligibility threshold must be finite.`;
     }
   }
 
@@ -717,7 +752,7 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
       ...draft,
       eligibilityRules: [
         ...draft.eligibilityRules,
-        { id: `rule-${Date.now()}-${draft.eligibilityRules.length}`, dimension: "boundary", operator: ">=", threshold: 0.8 },
+        { id: `rule-${Date.now()}-${draft.eligibilityRules.length}`, metric: "boundary", operator: ">=", threshold: 0.8 },
       ],
     });
   };
@@ -885,6 +920,10 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
 
               <div className="function-summary-groups">
                 <div>
+                  <span>Decision evidence</span>
+                  <strong>{evidenceModeLabels[selectedFunction.evidenceMode]}</strong>
+                </div>
+                <div>
                   <span>Parameters</span>
                   {selectedFunction.parameters.length === 0
                     ? <strong>None</strong>
@@ -986,9 +1025,9 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
                 </>
               )}
 
-              <div className="result-method">
-                <span>Analysis profile</span>
-                <strong>{activeAnalysis.profileEstimand} / {activeAnalysis.profileAggregationMethod} / {activeAnalysis.profileWeighting}</strong>
+              <div className="result-method result-method-grid">
+                <div><span>Decision evidence</span><strong>{evidenceModeLabels[selectedFunction.evidenceMode]}</strong></div>
+                <div><span>Analysis profile</span><strong>{activeAnalysis.profileEstimand} / {activeAnalysis.profileAggregationMethod} / {activeAnalysis.profileWeighting}</strong></div>
               </div>
             </div>
           </section>
@@ -1032,6 +1071,19 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
                       disabled={!isEditing}
                       onChange={(event: ChangeEvent<HTMLInputElement>) => setDraft({ ...draft, category: event.target.value })}
                     />
+                  </label>
+
+                  <label className="field-label">
+                    <span>Decision evidence</span>
+                    <select
+                      value={draft.evidenceMode}
+                      disabled={!isEditing}
+                      onChange={(event: ChangeEvent<HTMLSelectElement>) => setDraft({ ...draft, evidenceMode: event.target.value as DecisionEvidenceMode })}
+                    >
+                      <option value="point-estimate">Point estimate</option>
+                      <option value="lower-confidence-bound">Lower confidence bound</option>
+                    </select>
+                    <small className="field-help">Controls which exported compliance value is supplied to the six expression variables and dimension eligibility rules.</small>
                   </label>
 
                   <label className="field-label">
@@ -1151,7 +1203,7 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
                     <div className="recipe-subsection-heading">
                       <div>
                         <strong>Eligibility rules <span className="recipe-count">{draft.eligibilityRules.length}</span></strong>
-                        <span>Hard requirements evaluated before ranking.</span>
+                        <span>Hard requirements evaluated before ranking. Dimension rules use the selected decision evidence; availability uses the exported 0-1 analysis metric.</span>
                       </div>
                       {isEditing && <button className="text-button" type="button" onClick={addRule}>Add rule</button>}
                     </div>
@@ -1159,11 +1211,16 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
                       <span className="recipe-empty">No eligibility rules.</span>
                     ) : (
                       <div className="eligibility-list">
-                        <div className="eligibility-list-header" aria-hidden="true"><span>Dimension</span><span>Op</span><span>Threshold</span><span /></div>
+                        <div className="eligibility-list-header" aria-hidden="true"><span>Metric</span><span>Op</span><span>Threshold</span><span /></div>
                         {draft.eligibilityRules.map((rule, index) => (
                           <div className="eligibility-row" key={rule.id}>
-                            <select aria-label="Eligibility dimension" value={rule.dimension} disabled={!isEditing} onChange={(event: ChangeEvent<HTMLSelectElement>) => updateRule(index, { dimension: event.target.value as DecisionDimension })}>
-                              {complianceDimensions.map((dimension) => <option key={dimension} value={dimension}>{dimensionLabels[dimension]}</option>)}
+                            <select aria-label="Eligibility metric" value={rule.metric} disabled={!isEditing} onChange={(event: ChangeEvent<HTMLSelectElement>) => updateRule(index, { metric: event.target.value as DecisionEligibilityMetric })}>
+                              <optgroup label="Compliance dimensions">
+                                {complianceDimensions.map((dimension) => <option key={dimension} value={dimension}>{dimensionLabels[dimension]}</option>)}
+                              </optgroup>
+                              <optgroup label="Analysis metrics">
+                                <option value="availability">Availability</option>
+                              </optgroup>
                             </select>
                             <select aria-label="Eligibility operator" value={rule.operator} disabled={!isEditing} onChange={(event: ChangeEvent<HTMLSelectElement>) => updateRule(index, { operator: event.target.value as EligibilityOperator })}>
                               {eligibilityOperators.map((operator) => <option key={operator} value={operator}>{operator}</option>)}
@@ -1255,7 +1312,7 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
                       </div>
                     )}
                   </div>
-                  <p className="panel-note">This sweep varies the saved raw parameter value, reapplies any parameter-group normalization at every sample, and does not modify the saved recipe or canonical ACMM profiles.</p>
+                  <p className="panel-note">This sweep varies the saved raw parameter value, reapplies any parameter-group normalization at every sample, and evaluates the recipe using its saved decision-evidence basis. It does not modify the saved recipe or canonical ACMM profiles.</p>
                 </>
               )}
             </section>

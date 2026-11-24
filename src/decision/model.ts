@@ -1,5 +1,9 @@
 export type DecisionDimension = "goal" | "obligation" | "boundary" | "procedure" | "fidelity" | "recovery";
 
+export type DecisionEvidenceMode = "point-estimate" | "lower-confidence-bound";
+
+export type DecisionEligibilityMetric = DecisionDimension | "availability";
+
 export type EligibilityOperator = ">=" | ">" | "<=" | "<";
 
 export type DecisionParameterControl = "number" | "slider";
@@ -28,7 +32,7 @@ export interface DecisionParameterDefinition
 export interface DecisionEligibilityRule
 {
   id: string;
-  dimension: DecisionDimension;
+  metric: DecisionEligibilityMetric;
   operator: EligibilityOperator;
   threshold: number;
 }
@@ -39,6 +43,7 @@ export interface DecisionFunctionDefinition
   name: string;
   description: string;
   category: string;
+  evidenceMode: DecisionEvidenceMode;
   expression: string;
   parameterGroups: DecisionParameterGroupDefinition[];
   parameters: DecisionParameterDefinition[];

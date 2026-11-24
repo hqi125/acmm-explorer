@@ -1,6 +1,7 @@
 import type {
   DecisionEligibilityRule,
   DecisionFunctionDefinition,
+  DecisionEvidenceMode,
   DecisionParameterControl,
   DecisionParameterDefinition,
   DecisionParameterGroupDefinition,
@@ -81,23 +82,42 @@ function normalizeRules(value: unknown): DecisionEligibilityRule[]
   {
     return [];
   }
-  const dimensions = new Set(["goal", "obligation", "boundary", "procedure", "fidelity", "recovery"]);
+  const metrics = new Set(["goal", "obligation", "boundary", "procedure", "fidelity", "recovery", "availability"]);
   const operators = new Set([">=", ">", "<=", "<"]);
-  return value.filter((item): item is DecisionEligibilityRule =>
+  return value.flatMap((item): DecisionEligibilityRule[] =>
   {
     if (typeof item !== "object" || item === null)
     {
-      return false;
+      return [];
     }
-    const candidate = item as Partial<DecisionEligibilityRule>;
-    return typeof candidate.id === "string"
-      && typeof candidate.dimension === "string"
-      && dimensions.has(candidate.dimension)
-      && typeof candidate.operator === "string"
-      && operators.has(candidate.operator)
-      && typeof candidate.threshold === "number"
-      && Number.isFinite(candidate.threshold);
+    const candidate = item as Partial<DecisionEligibilityRule> & { dimension?: unknown };
+    const metric = typeof candidate.metric === "string"
+      ? candidate.metric
+      : typeof candidate.dimension === "string"
+        ? candidate.dimension
+        : null;
+    if (typeof candidate.id !== "string"
+      || metric === null
+      || !metrics.has(metric)
+      || typeof candidate.operator !== "string"
+      || !operators.has(candidate.operator)
+      || typeof candidate.threshold !== "number"
+      || !Number.isFinite(candidate.threshold))
+    {
+      return [];
+    }
+    return [{
+      id: candidate.id,
+      metric: metric as DecisionEligibilityRule["metric"],
+      operator: candidate.operator as DecisionEligibilityRule["operator"],
+      threshold: candidate.threshold,
+    }];
   });
+}
+
+function normalizeEvidenceMode(value: unknown): DecisionEvidenceMode
+{
+  return value === "lower-confidence-bound" ? "lower-confidence-bound" : "point-estimate";
 }
 
 function readCustomFunctions(): DecisionFunctionDefinition[]
@@ -145,6 +165,7 @@ function readCustomFunctions(): DecisionFunctionDefinition[]
         name: candidate.name,
         description: candidate.description,
         category: typeof candidate.category === "string" && candidate.category.trim().length > 0 ? candidate.category : "Custom",
+        evidenceMode: normalizeEvidenceMode(candidate.evidenceMode),
         expression: candidate.expression,
         parameterGroups,
         parameters,
@@ -180,6 +201,7 @@ export function createCustomDecisionFunction(source?: DecisionFunctionDefinition
     name: source === undefined ? "Untitled decision function" : `${source.name} copy`,
     description: source?.description ?? "Custom decision function.",
     category: "Custom",
+    evidenceMode: source?.evidenceMode ?? "point-estimate",
     expression: source?.expression ?? decisionFunctionPresets[0].expression,
     parameterGroups: source?.parameterGroups.map((item) => ({ ...item })) ?? [],
     parameters: source?.parameters.map((item) => ({ ...item })) ?? [],

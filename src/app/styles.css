@@ -2655,6 +2655,22 @@ textarea:focus-visible {
   color: #66675f;
 }
 
+
+.field-help {
+  color: var(--muted);
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.result-method-grid {
+  gap: 9px;
+}
+
+.result-method-grid > div {
+  display: grid;
+  gap: 4px;
+}
+
 .decision-expression {
   min-height: 104px;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
