@@ -1,5 +1,19 @@
 import { parse } from "yaml";
-import { complianceDimensions, type AcmmExportDataset, type AgentProfile, type AnalysisSnapshot, type ComplianceDimensionValue } from "../model";
+import {
+  complianceDimensions,
+  type AcmmExportDataset,
+  type AgentProfile,
+  type AnalysisSnapshot,
+  type AvailabilityFailureMode,
+  type AvailabilityInterval,
+  type AvailabilityScenario,
+  type ComplianceDimension,
+  type ComplianceDimensionValue,
+  type RequirementEstimate,
+  type TrajectoryRunMetric,
+  type TrajectorySubjectSummary,
+  type TrajectoryToolUsage,
+} from "../model";
 import { parseCsvEntry, parseNullableNumber, type DataRow } from "../ingest/table";
 import type { InspectionEntry, InspectionResult } from "../types";
 import type { AdapterMatch, PackageAdapter } from "./types";
@@ -323,12 +337,171 @@ function profileFromRows(
   };
 }
 
+
+function complianceDimensionValue(value: string | undefined): ComplianceDimension | null
+{
+  return complianceDimensions.includes(value as ComplianceDimension) ? value as ComplianceDimension : null;
+}
+
+function requirementRows(
+  estimateRows: DataRow[],
+  intervalRows: DataRow[],
+  sourcePath: string,
+  intervalSourcePath: string | null,
+): RequirementEstimate[]
+{
+  return estimateRows.flatMap((row): RequirementEstimate[] =>
+  {
+    const dimension = complianceDimensionValue(row.dimension);
+    if (dimension === null || row.subject_id.length === 0 || row.requirement_id.length === 0)
+    {
+      return [];
+    }
+
+    const interval = intervalRows.find((candidate) =>
+      candidate.estimand === row.estimand
+      && candidate.subject_id === row.subject_id
+      && candidate.requirement_id === row.requirement_id
+      && candidate.dimension === row.dimension,
+    );
+
+    return [{
+      estimand: row.estimand,
+      subjectId: row.subject_id,
+      requirementId: row.requirement_id,
+      dimension,
+      compliant: parseNullableNumber(row.compliant),
+      violation: parseNullableNumber(row.violation),
+      unadjudicable: parseNullableNumber(row.unadjudicable),
+      notApplicable: parseNullableNumber(row.not_applicable),
+      adjudicable: parseNullableNumber(row.adjudicable),
+      applicable: parseNullableNumber(row.applicable),
+      score: parseNullableNumber(row.p_hat),
+      coverage: parseNullableNumber(row.coverage),
+      lower: parseNullableNumber(interval?.p_hat_lower),
+      upper: parseNullableNumber(interval?.p_hat_upper),
+      intervalStatus: interval?.p_hat_interval_status ?? null,
+      sourcePath,
+      intervalSourcePath,
+    }];
+  });
+}
+
+function availabilityScenarioRows(rows: DataRow[], sourcePath: string): AvailabilityScenario[]
+{
+  return rows.filter((row) => row.subject_id.length > 0 && row.scenario_id.length > 0).map((row) => ({
+    subjectId: row.subject_id,
+    scenarioId: row.scenario_id,
+    plannedSlots: parseNullableNumber(row.planned_slots),
+    availableValidSlots: parseNullableNumber(row.available_valid_slots),
+    unavailableSlots: parseNullableNumber(row.unavailable_slots),
+    availability: parseNullableNumber(row.availability_fraction),
+    firstAttemptAvailability: parseNullableNumber(row.first_attempt_availability_fraction),
+    retriedSlots: parseNullableNumber(row.retried_slots),
+    recoveredByRetrySlots: parseNullableNumber(row.recovered_by_retry_slots),
+    sourcePath,
+  }));
+}
+
+function availabilityIntervalRows(rows: DataRow[], sourcePath: string): AvailabilityInterval[]
+{
+  return rows.filter((row) => row.subject_id.length > 0).map((row) => ({
+    subjectId: row.subject_id,
+    plannedSlots: parseNullableNumber(row.planned_slots),
+    scenarioClusters: parseNullableNumber(row.scenario_clusters),
+    availability: parseNullableNumber(row.availability_fraction),
+    confidenceLevel: parseNullableNumber(row.confidence_level),
+    lower: parseNullableNumber(row.availability_lower),
+    upper: parseNullableNumber(row.availability_upper),
+    intervalStatus: row.interval_status ?? "unknown",
+    sourcePath,
+  }));
+}
+
+function availabilityFailureRows(rows: DataRow[], sourcePath: string): AvailabilityFailureMode[]
+{
+  return rows.map((row) => ({
+    subjectId: row.subject_id.length > 0 ? row.subject_id : null,
+    finalTermination: row.final_termination,
+    failureKind: row.failure_kind,
+    unavailableSlots: parseNullableNumber(row.unavailable_slots),
+    fractionUnavailable: parseNullableNumber(row.fraction_of_scope_unavailable),
+    fractionPlanned: parseNullableNumber(row.fraction_of_scope_planned),
+    sourcePath,
+  }));
+}
+
+function trajectorySummaryRows(rows: DataRow[], sourcePath: string): TrajectorySubjectSummary[]
+{
+  return rows.filter((row) => row.subject_id.length > 0).map((row) => ({
+    subjectId: row.subject_id,
+    selectedRuns: parseNullableNumber(row.selected_runs),
+    totalToolCalls: parseNullableNumber(row.total_tool_calls),
+    meanToolCallsPerRun: parseNullableNumber(row.mean_tool_calls_per_run),
+    medianToolCallsPerRun: parseNullableNumber(row.median_tool_calls_per_run),
+    totalDistinctToolNames: parseNullableNumber(row.total_distinct_tool_names),
+    meanDistinctToolsPerRun: parseNullableNumber(row.mean_distinct_tools_per_run),
+    totalToolResults: parseNullableNumber(row.total_tool_results),
+    errorResults: parseNullableNumber(row.error_results),
+    errorRate: parseNullableNumber(row.error_rate),
+    repeatedCalls: parseNullableNumber(row.repeated_calls),
+    consecutiveRepeatedCalls: parseNullableNumber(row.consecutive_repeated_calls),
+    unmatchedCalls: parseNullableNumber(row.unmatched_calls),
+    unmatchedResults: parseNullableNumber(row.unmatched_results),
+    sourcePath,
+  }));
+}
+
+function trajectoryToolRows(rows: DataRow[], sourcePath: string): TrajectoryToolUsage[]
+{
+  return rows.filter((row) => row.subject_id.length > 0 && row.tool_name.length > 0).map((row) => ({
+    subjectId: row.subject_id,
+    toolName: row.tool_name,
+    calls: parseNullableNumber(row.calls),
+    runsUsingTool: parseNullableNumber(row.runs_using_tool),
+    runShare: parseNullableNumber(row.run_share),
+    results: parseNullableNumber(row.results),
+    errorResults: parseNullableNumber(row.error_results),
+    errorRate: parseNullableNumber(row.error_rate),
+    sourcePath,
+  }));
+}
+
+function trajectoryRunRows(rows: DataRow[], sourcePath: string): TrajectoryRunMetric[]
+{
+  return rows.filter((row) => row.subject_id.length > 0).map((row) => ({
+    runIndex: parseNullableNumber(row.run_index),
+    logicalRunId: row.logical_run_id,
+    runId: row.run_id,
+    subjectId: row.subject_id,
+    scenarioId: row.scenario_id,
+    repetition: parseNullableNumber(row.repetition),
+    toolCalls: parseNullableNumber(row.tool_calls),
+    distinctTools: parseNullableNumber(row.distinct_tools),
+    toolResults: parseNullableNumber(row.tool_results),
+    errorResults: parseNullableNumber(row.error_results),
+    errorRate: parseNullableNumber(row.error_rate),
+    repeatedCalls: parseNullableNumber(row.repeated_calls),
+    consecutiveRepeatedCalls: parseNullableNumber(row.consecutive_repeated_calls),
+    unmatchedCalls: parseNullableNumber(row.unmatched_calls),
+    unmatchedResults: parseNullableNumber(row.unmatched_results),
+    sourcePath,
+  }));
+}
+
 function buildAnalysisSnapshot(inspection: InspectionResult, candidate: AnalysisCandidate): AnalysisSnapshot
 {
   const scorePath = joinPath(candidate.path, "data/compliance/dimension_scores.csv");
   const intervalPath = joinPath(candidate.path, "data/compliance/dimension_intervals.csv");
+  const requirementPath = joinPath(candidate.path, "data/compliance/requirement_estimates.csv");
+  const requirementIntervalPath = joinPath(candidate.path, "data/compliance/requirement_intervals.csv");
   const availabilityPath = joinPath(candidate.path, "data/availability/availability_summary.csv");
+  const availabilityCellsPath = joinPath(candidate.path, "data/availability/availability_cells.csv");
+  const availabilityIntervalsPath = joinPath(candidate.path, "data/availability/availability_intervals.csv");
+  const availabilityFailurePath = joinPath(candidate.path, "data/availability/availability_failure_modes.csv");
   const trajectoryPath = joinPath(candidate.path, "data/trajectory/trajectory_subject_summary.csv");
+  const trajectoryToolPath = joinPath(candidate.path, "data/trajectory/trajectory_tool_usage.csv");
+  const trajectoryRunPath = joinPath(candidate.path, "data/trajectory/trajectory_run_metrics.csv");
 
   const scoreEntry = entryAt(inspection, scorePath);
   if (scoreEntry === null)
@@ -337,8 +510,15 @@ function buildAnalysisSnapshot(inspection: InspectionResult, candidate: Analysis
   }
 
   const intervalEntry = entryAt(inspection, intervalPath);
+  const requirementEntry = entryAt(inspection, requirementPath);
+  const requirementIntervalEntry = entryAt(inspection, requirementIntervalPath);
   const availabilityEntry = entryAt(inspection, availabilityPath);
+  const availabilityCellsEntry = entryAt(inspection, availabilityCellsPath);
+  const availabilityIntervalsEntry = entryAt(inspection, availabilityIntervalsPath);
+  const availabilityFailureEntry = entryAt(inspection, availabilityFailurePath);
   const trajectoryEntry = entryAt(inspection, trajectoryPath);
+  const trajectoryToolEntry = entryAt(inspection, trajectoryToolPath);
+  const trajectoryRunEntry = entryAt(inspection, trajectoryRunPath);
 
   const scoreRows = parseCsvEntry(scoreEntry);
   const intervalRows = intervalEntry === null ? [] : parseCsvEntry(intervalEntry);
@@ -356,6 +536,31 @@ function buildAnalysisSnapshot(inspection: InspectionResult, candidate: Analysis
     scorePath,
     intervalEntry === null ? null : intervalPath,
   ));
+
+  const requirements = requirementEntry === null ? [] : requirementRows(
+    parseCsvEntry(requirementEntry),
+    requirementIntervalEntry === null ? [] : parseCsvEntry(requirementIntervalEntry),
+    requirementPath,
+    requirementIntervalEntry === null ? null : requirementIntervalPath,
+  );
+  const availabilityScenarios = availabilityCellsEntry === null
+    ? []
+    : availabilityScenarioRows(parseCsvEntry(availabilityCellsEntry), availabilityCellsPath);
+  const availabilityIntervals = availabilityIntervalsEntry === null
+    ? []
+    : availabilityIntervalRows(parseCsvEntry(availabilityIntervalsEntry), availabilityIntervalsPath);
+  const availabilityFailureModes = availabilityFailureEntry === null
+    ? []
+    : availabilityFailureRows(parseCsvEntry(availabilityFailureEntry), availabilityFailurePath);
+  const trajectorySummaries = trajectoryEntry === null
+    ? []
+    : trajectorySummaryRows(trajectoryRows, trajectoryPath);
+  const trajectoryToolUsage = trajectoryToolEntry === null
+    ? []
+    : trajectoryToolRows(parseCsvEntry(trajectoryToolEntry), trajectoryToolPath);
+  const trajectoryRunMetrics = trajectoryRunEntry === null
+    ? []
+    : trajectoryRunRows(parseCsvEntry(trajectoryRunEntry), trajectoryRunPath);
 
   const dataPrefix = joinPath(candidate.path, "data");
   const availableTables = inspection.entries
@@ -378,6 +583,13 @@ function buildAnalysisSnapshot(inspection: InspectionResult, candidate: Analysis
     profileWeighting: candidate.profileWeighting,
     subjects,
     profiles,
+    requirements,
+    availabilityScenarios,
+    availabilityIntervals,
+    availabilityFailureModes,
+    trajectorySummaries,
+    trajectoryToolUsage,
+    trajectoryRunMetrics,
     availableTables,
   };
 }

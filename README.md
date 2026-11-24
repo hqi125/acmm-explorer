@@ -161,3 +161,8 @@ The selected evidence basis also applies to dimension-based eligibility rules. A
 ## v0.15 decision comparison
 
 The Decision Workshop includes a saved-recipe comparison section below parameter sensitivity. Two stored decision recipes can be applied to the same active analysis. The comparison focuses on eligible ranking position rather than treating raw outputs from different functions as a shared numeric scale. A rank-movement chart shows positional changes, while the adjacent table retains each recipe's raw output and eligibility result for audit.
+
+
+## v0.16 analyzed export detail views
+
+The normalized Data Explorer now exposes four linked analysis views for the selected analysis snapshot and subject: `Profile`, `Requirements`, `Availability`, and `Trajectory`. Requirements are read from exported `requirement_estimates.csv` / `requirement_intervals.csv` and can switch among available estimands. Availability uses scenario cells, subject intervals, and recorded failure-mode tables. Trajectory uses only exported trajectory subject/tool/run tables; older analyses without those tables display an explicit unavailable state rather than reconstructing behavior from raw run data. All charts remain frontend renderings of exported numeric tables, and table source links continue to jump to the corresponding file in the export inventory.

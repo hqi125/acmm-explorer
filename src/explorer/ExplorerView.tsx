@@ -28,6 +28,7 @@ import type {
 import { ComplianceRadar } from "../visualization/ComplianceRadar";
 import { ComplianceComparison } from "../visualization/ComplianceComparison";
 import { ComplianceMultiRadar } from "../visualization/ComplianceMultiRadar";
+import { AvailabilityDetailView, RequirementDetailView, TrajectoryDetailView } from "./AnalysisDetailViews";
 
 const inventoryPageSize = 20;
 
@@ -365,6 +366,7 @@ function NormalizedProfile({
 }: NormalizedProfileProps)
 {
   const [comparisonMode, setComparisonMode] = useState<"radar" | "bars">("radar");
+  const [detailView, setDetailView] = useState<"profile" | "requirements" | "availability" | "trajectory">("profile");
   const radarValues = useMemo(() =>
   {
     const values: Partial<Record<ComplianceDimension, number | null>> = {};
@@ -456,85 +458,100 @@ function NormalizedProfile({
         </div>
       </div>
 
-      <div className="profile-workspace">
-        <div className="profile-visual">
-          <div className="profile-section-heading">
-            <div>
-              <p className="eyebrow">Compliance profile</p>
-              <h3>{profile.subjectId}</h3>
+      <div className="analysis-view-tabs" role="tablist" aria-label="Analysis view">
+        <button className={detailView === "profile" ? "analysis-view-tab analysis-view-tab-active" : "analysis-view-tab"} type="button" onClick={() => setDetailView("profile")}>Profile</button>
+        <button className={detailView === "requirements" ? "analysis-view-tab analysis-view-tab-active" : "analysis-view-tab"} type="button" onClick={() => setDetailView("requirements")}>Requirements</button>
+        <button className={detailView === "availability" ? "analysis-view-tab analysis-view-tab-active" : "analysis-view-tab"} type="button" onClick={() => setDetailView("availability")}>Availability</button>
+        <button className={detailView === "trajectory" ? "analysis-view-tab analysis-view-tab-active" : "analysis-view-tab"} type="button" onClick={() => setDetailView("trajectory")}>Trajectory</button>
+      </div>
+
+      {detailView === "profile" && (
+        <>
+          <div className="profile-workspace">
+            <div className="profile-visual">
+              <div className="profile-section-heading">
+                <div>
+                  <p className="eyebrow">Compliance profile</p>
+                  <h3>{profile.subjectId}</h3>
+                </div>
+                <span className="tag tag-muted">Canonical analysis output</span>
+              </div>
+              <ComplianceRadar name={profile.subjectId} values={radarValues} ariaLabel={`ACMM compliance profile for ${profile.subjectId}`} />
             </div>
-            <span className="tag tag-muted">Canonical analysis output</span>
-          </div>
-          <ComplianceRadar name={profile.subjectId} values={radarValues} ariaLabel={`ACMM compliance profile for ${profile.subjectId}`} />
-        </div>
 
-        <div className="profile-evidence">
-          <div className="evidence-summary-grid">
-            <div><span>Availability</span><strong>{formatPercent(profile.availability)}</strong></div>
-            <div><span>Selected runs</span><strong>{formatInteger(profile.selectedRuns)}</strong></div>
-            <div><span>Tool calls</span><strong>{formatInteger(profile.totalToolCalls)}</strong></div>
-            <div><span>Mean calls/run</span><strong>{formatScore(profile.meanToolCallsPerRun, 2)}</strong></div>
-            <div><span>Tool error rate</span><strong>{formatPercent(profile.toolErrorRate)}</strong></div>
+            <div className="profile-evidence">
+              <div className="evidence-summary-grid">
+                <div><span>Availability</span><strong>{formatPercent(profile.availability)}</strong></div>
+                <div><span>Selected runs</span><strong>{formatInteger(profile.selectedRuns)}</strong></div>
+                <div><span>Tool calls</span><strong>{formatInteger(profile.totalToolCalls)}</strong></div>
+                <div><span>Mean calls/run</span><strong>{formatScore(profile.meanToolCallsPerRun, 2)}</strong></div>
+                <div><span>Tool error rate</span><strong>{formatPercent(profile.toolErrorRate)}</strong></div>
+              </div>
+
+              <div className="dimension-table-wrap">
+                <table className="dimension-table">
+                  <thead>
+                    <tr>
+                      <th>Dimension</th>
+                      <th>Score</th>
+                      <th>Interval</th>
+                      <th>Requirements</th>
+                      <th>Source</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {profile.dimensions.map((dimension) => (
+                      <tr key={dimension.dimension}>
+                        <th>{dimensionLabels[dimension.dimension]}</th>
+                        <td><strong>{formatScore(dimension.score)}</strong></td>
+                        <td>{dimension.lower === null || dimension.upper === null ? "-" : `${formatScore(dimension.lower)} - ${formatScore(dimension.upper)}`}</td>
+                        <td>{formatInteger(dimension.estimableRequirements)} / {formatInteger(dimension.totalRequirements)}</td>
+                        <td>
+                          <button className="source-link" type="button" onClick={() => onOpenSource(dimension.sourcePath)}>
+                            dimension_scores.csv
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
 
-          <div className="dimension-table-wrap">
-            <table className="dimension-table">
-              <thead>
-                <tr>
-                  <th>Dimension</th>
-                  <th>Score</th>
-                  <th>Interval</th>
-                  <th>Requirements</th>
-                  <th>Source</th>
-                </tr>
-              </thead>
-              <tbody>
-                {profile.dimensions.map((dimension) => (
-                  <tr key={dimension.dimension}>
-                    <th>{dimensionLabels[dimension.dimension]}</th>
-                    <td><strong>{formatScore(dimension.score)}</strong></td>
-                    <td>{dimension.lower === null || dimension.upper === null ? "-" : `${formatScore(dimension.lower)} - ${formatScore(dimension.upper)}`}</td>
-                    <td>{formatInteger(dimension.estimableRequirements)} / {formatInteger(dimension.totalRequirements)}</td>
-                    <td>
-                      <button className="source-link" type="button" onClick={() => onOpenSource(dimension.sourcePath)}>
-                        dimension_scores.csv
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="comparison-section">
+            <div className="profile-section-heading comparison-heading">
+              <div>
+                <p className="eyebrow">Agent comparison</p>
+                <h3>Compliance dimensions across subjects</h3>
+              </div>
+              <div className="comparison-controls" role="group" aria-label="Agent comparison visualization">
+                <button
+                  className={comparisonMode === "radar" ? "view-toggle view-toggle-active" : "view-toggle"}
+                  type="button"
+                  onClick={() => setComparisonMode("radar")}
+                >
+                  Merged radar
+                </button>
+                <button
+                  className={comparisonMode === "bars" ? "view-toggle view-toggle-active" : "view-toggle"}
+                  type="button"
+                  onClick={() => setComparisonMode("bars")}
+                >
+                  Bars
+                </button>
+              </div>
+            </div>
+            {comparisonMode === "radar"
+              ? <ComplianceMultiRadar profiles={analysis.profiles} />
+              : <ComplianceComparison profiles={analysis.profiles} />}
           </div>
-        </div>
-      </div>
+        </>
+      )}
 
-      <div className="comparison-section">
-        <div className="profile-section-heading comparison-heading">
-          <div>
-            <p className="eyebrow">Agent comparison</p>
-            <h3>Compliance dimensions across subjects</h3>
-          </div>
-          <div className="comparison-controls" role="group" aria-label="Agent comparison visualization">
-            <button
-              className={comparisonMode === "radar" ? "view-toggle view-toggle-active" : "view-toggle"}
-              type="button"
-              onClick={() => setComparisonMode("radar")}
-            >
-              Merged radar
-            </button>
-            <button
-              className={comparisonMode === "bars" ? "view-toggle view-toggle-active" : "view-toggle"}
-              type="button"
-              onClick={() => setComparisonMode("bars")}
-            >
-              Bars
-            </button>
-          </div>
-        </div>
-        {comparisonMode === "radar"
-          ? <ComplianceMultiRadar profiles={analysis.profiles} />
-          : <ComplianceComparison profiles={analysis.profiles} />}
-      </div>
+      {detailView === "requirements" && <RequirementDetailView analysis={analysis} profile={profile} onOpenSource={onOpenSource} />}
+      {detailView === "availability" && <AvailabilityDetailView analysis={analysis} profile={profile} onOpenSource={onOpenSource} />}
+      {detailView === "trajectory" && <TrajectoryDetailView analysis={analysis} profile={profile} onOpenSource={onOpenSource} />}
 
       <div className="analysis-table-note">
         <span>{analysis.availableTables.length} analysis data tables available.</span>

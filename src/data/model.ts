@@ -34,6 +34,117 @@ export interface AgentProfile
   toolErrorRate: number | null;
 }
 
+export interface RequirementEstimate
+{
+  estimand: string;
+  subjectId: string;
+  requirementId: string;
+  dimension: ComplianceDimension;
+  compliant: number | null;
+  violation: number | null;
+  unadjudicable: number | null;
+  notApplicable: number | null;
+  adjudicable: number | null;
+  applicable: number | null;
+  score: number | null;
+  coverage: number | null;
+  lower: number | null;
+  upper: number | null;
+  intervalStatus: string | null;
+  sourcePath: string;
+  intervalSourcePath: string | null;
+}
+
+export interface AvailabilityScenario
+{
+  subjectId: string;
+  scenarioId: string;
+  plannedSlots: number | null;
+  availableValidSlots: number | null;
+  unavailableSlots: number | null;
+  availability: number | null;
+  firstAttemptAvailability: number | null;
+  retriedSlots: number | null;
+  recoveredByRetrySlots: number | null;
+  sourcePath: string;
+}
+
+export interface AvailabilityInterval
+{
+  subjectId: string;
+  plannedSlots: number | null;
+  scenarioClusters: number | null;
+  availability: number | null;
+  confidenceLevel: number | null;
+  lower: number | null;
+  upper: number | null;
+  intervalStatus: string;
+  sourcePath: string;
+}
+
+export interface AvailabilityFailureMode
+{
+  subjectId: string | null;
+  finalTermination: string;
+  failureKind: string;
+  unavailableSlots: number | null;
+  fractionUnavailable: number | null;
+  fractionPlanned: number | null;
+  sourcePath: string;
+}
+
+export interface TrajectorySubjectSummary
+{
+  subjectId: string;
+  selectedRuns: number | null;
+  totalToolCalls: number | null;
+  meanToolCallsPerRun: number | null;
+  medianToolCallsPerRun: number | null;
+  totalDistinctToolNames: number | null;
+  meanDistinctToolsPerRun: number | null;
+  totalToolResults: number | null;
+  errorResults: number | null;
+  errorRate: number | null;
+  repeatedCalls: number | null;
+  consecutiveRepeatedCalls: number | null;
+  unmatchedCalls: number | null;
+  unmatchedResults: number | null;
+  sourcePath: string;
+}
+
+export interface TrajectoryToolUsage
+{
+  subjectId: string;
+  toolName: string;
+  calls: number | null;
+  runsUsingTool: number | null;
+  runShare: number | null;
+  results: number | null;
+  errorResults: number | null;
+  errorRate: number | null;
+  sourcePath: string;
+}
+
+export interface TrajectoryRunMetric
+{
+  runIndex: number | null;
+  logicalRunId: string;
+  runId: string;
+  subjectId: string;
+  scenarioId: string;
+  repetition: number | null;
+  toolCalls: number | null;
+  distinctTools: number | null;
+  toolResults: number | null;
+  errorResults: number | null;
+  errorRate: number | null;
+  repeatedCalls: number | null;
+  consecutiveRepeatedCalls: number | null;
+  unmatchedCalls: number | null;
+  unmatchedResults: number | null;
+  sourcePath: string;
+}
+
 export interface AnalysisSnapshot
 {
   id: string;
@@ -49,6 +160,13 @@ export interface AnalysisSnapshot
   profileWeighting: string;
   subjects: string[];
   profiles: AgentProfile[];
+  requirements: RequirementEstimate[];
+  availabilityScenarios: AvailabilityScenario[];
+  availabilityIntervals: AvailabilityInterval[];
+  availabilityFailureModes: AvailabilityFailureMode[];
+  trajectorySummaries: TrajectorySubjectSummary[];
+  trajectoryToolUsage: TrajectoryToolUsage[];
+  trajectoryRunMetrics: TrajectoryRunMetric[];
   availableTables: string[];
 }
 
