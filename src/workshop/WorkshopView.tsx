@@ -35,6 +35,7 @@ import { detectDecisionSensitivityCrossings } from "../decision/sensitivity";
 import { decisionRecipeFileName, parseDecisionRecipe, serializeDecisionRecipe } from "../decision/transfer";
 import { ComplianceMultiRadar } from "../visualization/ComplianceMultiRadar";
 import { DecisionScoreChart } from "../visualization/DecisionScoreChart";
+import { DecisionRankComparisonChart, type DecisionRankComparisonRow } from "../visualization/DecisionRankComparisonChart";
 import { DecisionSensitivityChart, type DecisionSensitivitySeries } from "../visualization/DecisionSensitivityChart";
 
 interface WorkshopViewProps
@@ -197,6 +198,25 @@ function evaluateProfiles(analysis: AnalysisSnapshot, definition: DecisionFuncti
   });
 }
 
+
+function eligibleRankMap(evaluations: DecisionEvaluation[]): Map<string, number>
+{
+  const eligible = evaluations.filter((item) => item.eligible === true && item.value !== null);
+  return new Map(eligible.map((item, index) => [item.subjectId, index + 1]));
+}
+
+function evaluationLabel(evaluation: DecisionEvaluation | undefined): string
+{
+  if (evaluation === undefined || evaluation.error !== null || evaluation.value === null)
+  {
+    return "Unavailable";
+  }
+  if (evaluation.eligible === false)
+  {
+    return "Ineligible";
+  }
+  return evaluation.value.toFixed(4);
+}
 
 function evaluateSensitivity(
   analysis: AnalysisSnapshot,
@@ -388,6 +408,8 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
   const [isEditing, setIsEditing] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [sensitivityParameterId, setSensitivityParameterId] = useState("");
+  const [comparisonLeftId, setComparisonLeftId] = useState("preset-equal-mean");
+  const [comparisonRightId, setComparisonRightId] = useState("");
   const recipeImportRef = useRef<HTMLInputElement>(null);
 
   useEffect(() =>
@@ -463,6 +485,23 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
 
   useEffect(() =>
   {
+    if (selectedFunction === null)
+    {
+      return;
+    }
+    setComparisonLeftId(selectedFunction.id);
+    setComparisonRightId((current) =>
+    {
+      if (current !== "" && current !== selectedFunction.id && functions.some((item) => item.id === current))
+      {
+        return current;
+      }
+      return functions.find((item) => item.id !== selectedFunction.id)?.id ?? selectedFunction.id;
+    });
+  }, [functions, selectedFunction]);
+
+  useEffect(() =>
+  {
     const bounded = selectedFunction?.parameters.filter((parameter) =>
       parameter.min !== null && parameter.max !== null && parameter.max > parameter.min) ?? [];
     setSensitivityParameterId((current) =>
@@ -480,6 +519,52 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
       ? []
       : evaluateProfiles(activeAnalysis, selectedFunction),
     [activeAnalysis, isEditing, selectedFunction],
+  );
+  const comparisonLeftFunction = useMemo(
+    () => functions.find((item) => item.id === comparisonLeftId) ?? null,
+    [comparisonLeftId, functions],
+  );
+  const comparisonRightFunction = useMemo(
+    () => functions.find((item) => item.id === comparisonRightId) ?? null,
+    [comparisonRightId, functions],
+  );
+  const comparisonLeftEvaluations = useMemo(
+    () => activeAnalysis === null || comparisonLeftFunction === null || isEditing
+      ? []
+      : evaluateProfiles(activeAnalysis, comparisonLeftFunction),
+    [activeAnalysis, comparisonLeftFunction, isEditing],
+  );
+  const comparisonRightEvaluations = useMemo(
+    () => activeAnalysis === null || comparisonRightFunction === null || isEditing
+      ? []
+      : evaluateProfiles(activeAnalysis, comparisonRightFunction),
+    [activeAnalysis, comparisonRightFunction, isEditing],
+  );
+  const comparisonRows = useMemo(() =>
+  {
+    const leftRanks = eligibleRankMap(comparisonLeftEvaluations);
+    const rightRanks = eligibleRankMap(comparisonRightEvaluations);
+    const leftBySubject = new Map(comparisonLeftEvaluations.map((item) => [item.subjectId, item]));
+    const rightBySubject = new Map(comparisonRightEvaluations.map((item) => [item.subjectId, item]));
+    const subjectIds = Array.from(new Set([
+      ...comparisonLeftEvaluations.map((item) => item.subjectId),
+      ...comparisonRightEvaluations.map((item) => item.subjectId),
+    ])).sort();
+    return subjectIds.map((subjectId) => ({
+      subjectId,
+      leftEvaluation: leftBySubject.get(subjectId),
+      rightEvaluation: rightBySubject.get(subjectId),
+      leftRank: leftRanks.get(subjectId) ?? null,
+      rightRank: rightRanks.get(subjectId) ?? null,
+    }));
+  }, [comparisonLeftEvaluations, comparisonRightEvaluations]);
+  const comparisonChartRows = useMemo<DecisionRankComparisonRow[]>(
+    () => comparisonRows.map((row) => ({
+      subjectId: row.subjectId,
+      leftRank: row.leftRank,
+      rightRank: row.rightRank,
+    })),
+    [comparisonRows],
   );
 
   const sensitivityParameter = useMemo(
@@ -1313,6 +1398,116 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
                     )}
                   </div>
                   <p className="panel-note">This sweep varies the saved raw parameter value, reapplies any parameter-group normalization at every sample, and evaluates the recipe using its saved decision-evidence basis. It does not modify the saved recipe or canonical ACMM profiles.</p>
+                </>
+              )}
+            </section>
+
+            <section className={`workshop-section-card comparison-section ${isEditing ? "section-invalidated" : ""}`}>
+              <div className="panel-heading section-heading-wide">
+                <div>
+                  <p className="eyebrow">Decision comparison</p>
+                  <h2>Compare two saved decision recipes</h2>
+                  <p>Apply two saved recipes to the same analysis and compare ranking positions. Raw decision outputs remain visible, but are not treated as a common scale.</p>
+                </div>
+                <span className={isEditing ? "tag tag-warning" : "tag tag-muted"}>{isEditing ? "invalidated" : "saved recipes only"}</span>
+              </div>
+
+              {isEditing ? (
+                <div className="preview-empty compact-empty invalidated-result-message">
+                  <strong>Decision comparison is out of date.</strong>
+                  <span>Save or cancel the current draft before comparing saved decision recipes.</span>
+                </div>
+              ) : comparisonLeftFunction === null || comparisonRightFunction === null ? (
+                <div className="preview-empty compact-empty">
+                  <strong>Two saved functions are required.</strong>
+                  <span>Create or select another saved decision function to enable comparison.</span>
+                </div>
+              ) : (
+                <>
+                  <div className="comparison-function-selectors">
+                    <label className="field-label">
+                      <span>Function A</span>
+                      <select value={comparisonLeftId} onChange={(event: ChangeEvent<HTMLSelectElement>) => setComparisonLeftId(event.target.value)}>
+                        {presetCategories.map((category) => (
+                          <optgroup key={`left-${category}`} label={`Preset - ${category}`}>
+                            {functions.filter((item) => item.source === "preset" && item.category === category).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+                          </optgroup>
+                        ))}
+                        {functions.some((item) => item.source === "custom") && (
+                          <optgroup label="Custom">
+                            {functions.filter((item) => item.source === "custom").map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+                          </optgroup>
+                        )}
+                      </select>
+                      <small className="field-help">Evidence: {evidenceModeLabels[comparisonLeftFunction.evidenceMode]}</small>
+                    </label>
+                    <div className="comparison-arrow" aria-hidden="true">versus</div>
+                    <label className="field-label">
+                      <span>Function B</span>
+                      <select value={comparisonRightId} onChange={(event: ChangeEvent<HTMLSelectElement>) => setComparisonRightId(event.target.value)}>
+                        {presetCategories.map((category) => (
+                          <optgroup key={`right-${category}`} label={`Preset - ${category}`}>
+                            {functions.filter((item) => item.source === "preset" && item.category === category).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+                          </optgroup>
+                        ))}
+                        {functions.some((item) => item.source === "custom") && (
+                          <optgroup label="Custom">
+                            {functions.filter((item) => item.source === "custom").map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+                          </optgroup>
+                        )}
+                      </select>
+                      <small className="field-help">Evidence: {evidenceModeLabels[comparisonRightFunction.evidenceMode]}</small>
+                    </label>
+                  </div>
+
+                  <div className="decision-comparison-layout">
+                    <div className="comparison-rank-chart-block">
+                      <div className="score-visual-heading">
+                        <strong>Rank movement</strong>
+                        <span>Eligible ranking position only; lower rank number is better.</span>
+                      </div>
+                      <DecisionRankComparisonChart
+                        leftLabel="Function A"
+                        rightLabel="Function B"
+                        rows={comparisonChartRows}
+                      />
+                    </div>
+
+                    <div className="decision-comparison-table-wrap">
+                      <table className="decision-comparison-table">
+                        <thead>
+                          <tr>
+                            <th>Agent</th>
+                            <th>A rank</th>
+                            <th>A output</th>
+                            <th>B rank</th>
+                            <th>B output</th>
+                            <th>Rank change</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {comparisonRows.map((row) =>
+                          {
+                            const change = row.leftRank !== null && row.rightRank !== null ? row.leftRank - row.rightRank : null;
+                            return (
+                              <tr key={row.subjectId}>
+                                <td><strong>{row.subjectId}</strong></td>
+                                <td>{row.leftRank === null ? "-" : `#${row.leftRank}`}</td>
+                                <td>{evaluationLabel(row.leftEvaluation)}</td>
+                                <td>{row.rightRank === null ? "-" : `#${row.rightRank}`}</td>
+                                <td>{evaluationLabel(row.rightEvaluation)}</td>
+                                <td className={change === null ? "" : change > 0 ? "rank-change-up" : change < 0 ? "rank-change-down" : "rank-change-same"}>
+                                  {change === null ? "-" : change > 0 ? `+${change}` : change.toString()}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <p className="panel-note">Function outputs are shown for traceability only. Because recipes may use different formulas, evidence bases, parameter scales, or eligibility rules, numeric outputs across Function A and Function B are not assumed to be directly comparable.</p>
                 </>
               )}
             </section>

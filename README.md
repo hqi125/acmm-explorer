@@ -157,3 +157,7 @@ Decision recipes choose how the six GOBPFR variables are populated before the ex
 - `lower-confidence-bound`: use each exported dimension interval lower bound. If a required lower bound is unavailable, that subject is reported as unavailable for the decision rather than silently falling back to the point estimate.
 
 The selected evidence basis also applies to dimension-based eligibility rules. Availability is deliberately separate from GOBPFR and can be used only as an eligibility metric; it is not introduced as a seventh compliance dimension. The sensitivity sweep uses the same saved evidence basis as the active recipe.
+
+## v0.15 decision comparison
+
+The Decision Workshop includes a saved-recipe comparison section below parameter sensitivity. Two stored decision recipes can be applied to the same active analysis. The comparison focuses on eligible ranking position rather than treating raw outputs from different functions as a shared numeric scale. A rank-movement chart shows positional changes, while the adjacent table retains each recipe's raw output and eligibility result for audit.
