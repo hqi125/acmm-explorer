@@ -1,20 +1,26 @@
 {
-  "schemaVersion": "acmm-explorer-schema-catalog/0.1",
-  "generatedAt": "2026-11-24T14:00:39.463Z",
+  "schemaVersion": "acmm-explorer-schema-catalog/0.2",
+  "generatedAt": "2026-11-24T15:24:38.158Z",
   "sources": [
     {
       "id": "core",
       "label": "Core",
       "commit": "5b47cd720339166c58e342ceef5d27072bcf4ef7",
       "schemaCount": 41,
-      "fieldCount": 2183
+      "fieldCount": 2183,
+      "packageCount": 0,
+      "packageDocumentCount": 0,
+      "packageFieldCount": 0
     },
     {
       "id": "experiments",
       "label": "Experiments",
       "commit": "0b23fcb1a3aa1b2ffdcf6845140eb915cd848bcf",
       "schemaCount": 0,
-      "fieldCount": 0
+      "fieldCount": 0,
+      "packageCount": 3,
+      "packageDocumentCount": 6,
+      "packageFieldCount": 246
     }
   ],
   "schemas": [
@@ -51759,6 +51765,3368 @@
       "sourceId": "core",
       "sourceLabel": "Core",
       "sourceRelativePath": "src/acmm/secret_bindings/schemas/secret-bindings-v0.2.schema.json"
+    }
+  ],
+  "packages": [
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1",
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "relativeRoot": "github_mcp_integration_qualification_v1",
+      "label": "github_mcp_integration_qualification_v1",
+      "documentIds": [
+        "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+        "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml"
+      ],
+      "fieldCount": 76,
+      "documentCount": 2
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1",
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "relativeRoot": "github_mcp_project_workspace_v1",
+      "label": "github_mcp_project_workspace_v1",
+      "documentIds": [
+        "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+        "experiments:package:github_mcp_project_workspace_v1:experiment.yaml"
+      ],
+      "fieldCount": 103,
+      "documentCount": 2
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1",
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "relativeRoot": "minimal_agent_baseline_v1",
+      "label": "minimal_agent_baseline_v1",
+      "documentIds": [
+        "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml",
+        "experiments:package:minimal_agent_baseline_v1:experiment.yaml"
+      ],
+      "fieldCount": 67,
+      "documentCount": 2
+    }
+  ],
+  "packageDocuments": [
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "relativeRoot": "github_mcp_integration_qualification_v1",
+      "relativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml",
+      "fileName": "experiment-package.yaml",
+      "fileSha256": "6e644115570cdc65e88b21497d3b17e91435359860ae4720346e942070de0b51",
+      "topLevelKeys": [
+        "contract",
+        "experiment_id",
+        "integrations",
+        "runtime",
+        "schema_version"
+      ],
+      "fieldCount": 24
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "relativeRoot": "github_mcp_integration_qualification_v1",
+      "relativePath": "github_mcp_integration_qualification_v1/experiment.yaml",
+      "fileName": "experiment.yaml",
+      "fileSha256": "7d304aa4f3629cc2b47bf99b2255b34b407b241a1e03bd9eb9ea540c8ae05c33",
+      "topLevelKeys": [
+        "checks",
+        "evidence_policy",
+        "experiment",
+        "requirements",
+        "run_protocol",
+        "scenarios",
+        "schema_version",
+        "subjects"
+      ],
+      "fieldCount": 52
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "relativeRoot": "github_mcp_project_workspace_v1",
+      "relativePath": "github_mcp_project_workspace_v1/experiment-package.yaml",
+      "fileName": "experiment-package.yaml",
+      "fileSha256": "f72f23eac221d897f83a6e54daa100c571e04b2c18cea831f81347b6153730fb",
+      "topLevelKeys": [
+        "adjudication",
+        "campaign",
+        "contract",
+        "experiment_id",
+        "integrations",
+        "runtime",
+        "schema_version",
+        "secrets"
+      ],
+      "fieldCount": 45
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "relativeRoot": "github_mcp_project_workspace_v1",
+      "relativePath": "github_mcp_project_workspace_v1/experiment.yaml",
+      "fileName": "experiment.yaml",
+      "fileSha256": "509ea136155d503f76e5cb5c87db03935d5ec447e1b452a4018c2a39855eda4d",
+      "topLevelKeys": [
+        "checks",
+        "evidence_policy",
+        "experiment",
+        "requirements",
+        "run_protocol",
+        "scenarios",
+        "schema_version",
+        "subjects"
+      ],
+      "fieldCount": 58
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "relativeRoot": "minimal_agent_baseline_v1",
+      "relativePath": "minimal_agent_baseline_v1/experiment-package.yaml",
+      "fileName": "experiment-package.yaml",
+      "fileSha256": "ba53327de1566a21fffe6a9f809ddc3c0ecd3e1cc079ba54084699ccd7eff0d6",
+      "topLevelKeys": [
+        "contract",
+        "experiment_id",
+        "runtime",
+        "schema_version"
+      ],
+      "fieldCount": 7
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "relativeRoot": "minimal_agent_baseline_v1",
+      "relativePath": "minimal_agent_baseline_v1/experiment.yaml",
+      "fileName": "experiment.yaml",
+      "fileSha256": "3e3eaa79361886fc71fb44b8590d7e445210fef96f802de3a1777e5f47474101",
+      "topLevelKeys": [
+        "checks",
+        "evidence_policy",
+        "experiment",
+        "requirements",
+        "run_protocol",
+        "scenarios",
+        "schema_version",
+        "subjects"
+      ],
+      "fieldCount": 60
+    }
+  ],
+  "packageFields": [
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::contract",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "contract",
+      "path": "contract",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::experiment_id",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "experiment_id",
+      "path": "experiment_id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "integrations",
+      "path": "integrations",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].api_version",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "api_version",
+      "path": "integrations[].api_version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].configuration",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "configuration",
+      "path": "integrations[].configuration",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].configuration.endpoint",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "endpoint",
+      "path": "integrations[].configuration.endpoint",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].configuration.local_service",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "local_service",
+      "path": "integrations[].configuration.local_service",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].configuration.local_service.container_name",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "container_name",
+      "path": "integrations[].configuration.local_service.container_name",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].configuration.local_service.host_port",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "host_port",
+      "path": "integrations[].configuration.local_service.host_port",
+      "types": [
+        "integer"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].configuration.local_service.image",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "image",
+      "path": "integrations[].configuration.local_service.image",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].configuration.server_id",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "server_id",
+      "path": "integrations[].configuration.server_id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].configuration.tools",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "tools",
+      "path": "integrations[].configuration.tools",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].entrypoint",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "entrypoint",
+      "path": "integrations[].entrypoint",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].id",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "id",
+      "path": "integrations[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].preset",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "preset",
+      "path": "integrations[].preset",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].root",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "root",
+      "path": "integrations[].root",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].secrets",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "secrets",
+      "path": "integrations[].secrets",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].secrets[].id",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "id",
+      "path": "integrations[].secrets[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::integrations[].secrets[].required",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "required",
+      "path": "integrations[].secrets[].required",
+      "types": [
+        "boolean"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::runtime",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "runtime",
+      "path": "runtime",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::runtime.api_version",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "api_version",
+      "path": "runtime.api_version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::runtime.entrypoint",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "entrypoint",
+      "path": "runtime.entrypoint",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::runtime.root",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "root",
+      "path": "runtime.root",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml::field::schema_version",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "schema_version",
+      "path": "schema_version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::checks",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "checks",
+      "path": "checks",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::checks[].evaluator",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "evaluator",
+      "path": "checks[].evaluator",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::checks[].id",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "id",
+      "path": "checks[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::evidence_policy",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "evidence_policy",
+      "path": "evidence_policy",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::evidence_policy.capture",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "capture",
+      "path": "evidence_policy.capture",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::experiment",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "experiment",
+      "path": "experiment",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::experiment.description",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "description",
+      "path": "experiment.description",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::experiment.id",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "id",
+      "path": "experiment.id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::experiment.title",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "title",
+      "path": "experiment.title",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::requirements",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "requirements",
+      "path": "requirements",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::requirements[].applicability",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "applicability",
+      "path": "requirements[].applicability",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::requirements[].compliance",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "compliance",
+      "path": "requirements[].compliance",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::requirements[].dimension",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "dimension",
+      "path": "requirements[].dimension",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::requirements[].id",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "id",
+      "path": "requirements[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::requirements[].statement",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "statement",
+      "path": "requirements[].statement",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::run_protocol",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "run_protocol",
+      "path": "run_protocol",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::run_protocol.repetitions",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "repetitions",
+      "path": "run_protocol.repetitions",
+      "types": [
+        "integer"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::run_protocol.reset",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "reset",
+      "path": "run_protocol.reset",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::run_protocol.reset.conversation",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "conversation",
+      "path": "run_protocol.reset.conversation",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::run_protocol.reset.environment",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "environment",
+      "path": "run_protocol.reset.environment",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::run_protocol.reset.memory",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "memory",
+      "path": "run_protocol.reset.memory",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::run_protocol.reset.workspace",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "workspace",
+      "path": "run_protocol.reset.workspace",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::run_protocol.termination",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "termination",
+      "path": "run_protocol.termination",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::run_protocol.termination.timeout_seconds",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "timeout_seconds",
+      "path": "run_protocol.termination.timeout_seconds",
+      "types": [
+        "integer"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "scenarios",
+      "path": "scenarios",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].description",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "description",
+      "path": "scenarios[].description",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].environment",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "environment",
+      "path": "scenarios[].environment",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].environment.fixture",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "fixture",
+      "path": "scenarios[].environment.fixture",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].id",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "id",
+      "path": "scenarios[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].opportunities",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "opportunities",
+      "path": "scenarios[].opportunities",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].opportunities[].check_id",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "check_id",
+      "path": "scenarios[].opportunities[].check_id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].opportunities[].id",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "id",
+      "path": "scenarios[].opportunities[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].opportunities[].requirement_id",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "requirement_id",
+      "path": "scenarios[].opportunities[].requirement_id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].task",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "task",
+      "path": "scenarios[].task",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].task.output_semantics",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "output_semantics",
+      "path": "scenarios[].task.output_semantics",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].task.output_semantics.structured_object",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "structured_object",
+      "path": "scenarios[].task.output_semantics.structured_object",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].task.output_semantics.structured_object.accepted_presentations",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "accepted_presentations",
+      "path": "scenarios[].task.output_semantics.structured_object.accepted_presentations",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].task.output_semantics.structured_object.evidence_id",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "evidence_id",
+      "path": "scenarios[].task.output_semantics.structured_object.evidence_id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].task.output_semantics.structured_object.payload_path",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "payload_path",
+      "path": "scenarios[].task.output_semantics.structured_object.payload_path",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].task.output_semantics.structured_object.required_payload_keys",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "required_payload_keys",
+      "path": "scenarios[].task.output_semantics.structured_object.required_payload_keys",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::scenarios[].task.prompt",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "prompt",
+      "path": "scenarios[].task.prompt",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::schema_version",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "schema_version",
+      "path": "schema_version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::subjects",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "subjects",
+      "path": "subjects",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::subjects[].agent",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "agent",
+      "path": "subjects[].agent",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::subjects[].agent.name",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "name",
+      "path": "subjects[].agent.name",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::subjects[].agent.version",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "version",
+      "path": "subjects[].agent.version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::subjects[].configuration",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "configuration",
+      "path": "subjects[].configuration",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::subjects[].configuration.context_window",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "context_window",
+      "path": "subjects[].configuration.context_window",
+      "types": [
+        "integer"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::subjects[].id",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "id",
+      "path": "subjects[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::subjects[].model",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "model",
+      "path": "subjects[].model",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::subjects[].model.name",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "name",
+      "path": "subjects[].model.name",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml::field::subjects[].model.provider",
+      "documentId": "experiments:package:github_mcp_integration_qualification_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_integration_qualification_v1",
+      "name": "provider",
+      "path": "subjects[].model.provider",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_integration_qualification_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::adjudication",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "adjudication",
+      "path": "adjudication",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::adjudication.api_version",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "api_version",
+      "path": "adjudication.api_version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::adjudication.entrypoint",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "entrypoint",
+      "path": "adjudication.entrypoint",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::adjudication.root",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "root",
+      "path": "adjudication.root",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::campaign",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "campaign",
+      "path": "campaign",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::campaign.materialization",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "materialization",
+      "path": "campaign.materialization",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::campaign.materialization.group_by",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "group_by",
+      "path": "campaign.materialization.group_by",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::contract",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "contract",
+      "path": "contract",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::experiment_id",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "experiment_id",
+      "path": "experiment_id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "integrations",
+      "path": "integrations",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].api_version",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "api_version",
+      "path": "integrations[].api_version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "configuration",
+      "path": "integrations[].configuration",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.endpoint",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "endpoint",
+      "path": "integrations[].configuration.endpoint",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.excluded_tools",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "excluded_tools",
+      "path": "integrations[].configuration.excluded_tools",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.expected_catalog_sha256",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "expected_catalog_sha256",
+      "path": "integrations[].configuration.expected_catalog_sha256",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.expected_tools",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "expected_tools",
+      "path": "integrations[].configuration.expected_tools",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.github_api_base",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "github_api_base",
+      "path": "integrations[].configuration.github_api_base",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.local_service",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "local_service",
+      "path": "integrations[].configuration.local_service",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.local_service.container_name",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "container_name",
+      "path": "integrations[].configuration.local_service.container_name",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.local_service.governor_version",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "governor_version",
+      "path": "integrations[].configuration.local_service.governor_version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.local_service.host_port",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "host_port",
+      "path": "integrations[].configuration.local_service.host_port",
+      "types": [
+        "integer"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.local_service.image",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "image",
+      "path": "integrations[].configuration.local_service.image",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.local_service.mutation_interval",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "mutation_interval",
+      "path": "integrations[].configuration.local_service.mutation_interval",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.local_service.primary_reset_grace",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "primary_reset_grace",
+      "path": "integrations[].configuration.local_service.primary_reset_grace",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.local_service.request_interval",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "request_interval",
+      "path": "integrations[].configuration.local_service.request_interval",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.local_service.retry_after_grace",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "retry_after_grace",
+      "path": "integrations[].configuration.local_service.retry_after_grace",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.local_service.secondary_backoff",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "secondary_backoff",
+      "path": "integrations[].configuration.local_service.secondary_backoff",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.local_service.source_commit",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "source_commit",
+      "path": "integrations[].configuration.local_service.source_commit",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.local_service.source_repository",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "source_repository",
+      "path": "integrations[].configuration.local_service.source_repository",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.local_service.upstream_commit",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "upstream_commit",
+      "path": "integrations[].configuration.local_service.upstream_commit",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.local_service.upstream_version",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "upstream_version",
+      "path": "integrations[].configuration.local_service.upstream_version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.server_id",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "server_id",
+      "path": "integrations[].configuration.server_id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].configuration.toolsets",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "toolsets",
+      "path": "integrations[].configuration.toolsets",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].entrypoint",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "entrypoint",
+      "path": "integrations[].entrypoint",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].id",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "id",
+      "path": "integrations[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].preset",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "preset",
+      "path": "integrations[].preset",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::integrations[].root",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "root",
+      "path": "integrations[].root",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::runtime",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "runtime",
+      "path": "runtime",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::runtime.api_version",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "api_version",
+      "path": "runtime.api_version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::runtime.entrypoint",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "entrypoint",
+      "path": "runtime.entrypoint",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::runtime.root",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "root",
+      "path": "runtime.root",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::schema_version",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "schema_version",
+      "path": "schema_version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::secrets",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "secrets",
+      "path": "secrets",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::secrets[].id",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "id",
+      "path": "secrets[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml::field::secrets[].required",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment-package.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "required",
+      "path": "secrets[].required",
+      "types": [
+        "boolean"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::checks",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "checks",
+      "path": "checks",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::checks[].evaluator",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "evaluator",
+      "path": "checks[].evaluator",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::checks[].id",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "id",
+      "path": "checks[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::evidence_policy",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "evidence_policy",
+      "path": "evidence_policy",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::evidence_policy.capture",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "capture",
+      "path": "evidence_policy.capture",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::experiment",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "experiment",
+      "path": "experiment",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::experiment.description",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "description",
+      "path": "experiment.description",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::experiment.id",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "id",
+      "path": "experiment.id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::experiment.title",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "title",
+      "path": "experiment.title",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::requirements",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "requirements",
+      "path": "requirements",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::requirements[].applicability",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "applicability",
+      "path": "requirements[].applicability",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::requirements[].compliance",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "compliance",
+      "path": "requirements[].compliance",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::requirements[].dimension",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "dimension",
+      "path": "requirements[].dimension",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::requirements[].id",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "id",
+      "path": "requirements[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::requirements[].statement",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "statement",
+      "path": "requirements[].statement",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::run_protocol",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "run_protocol",
+      "path": "run_protocol",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::run_protocol.ordering",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "ordering",
+      "path": "run_protocol.ordering",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::run_protocol.pacing",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "pacing",
+      "path": "run_protocol.pacing",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::run_protocol.pacing.inter_run_delay_seconds",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "inter_run_delay_seconds",
+      "path": "run_protocol.pacing.inter_run_delay_seconds",
+      "types": [
+        "number"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::run_protocol.repetitions",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "repetitions",
+      "path": "run_protocol.repetitions",
+      "types": [
+        "integer"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::run_protocol.reset",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "reset",
+      "path": "run_protocol.reset",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::run_protocol.reset.conversation",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "conversation",
+      "path": "run_protocol.reset.conversation",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::run_protocol.reset.environment",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "environment",
+      "path": "run_protocol.reset.environment",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::run_protocol.reset.memory",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "memory",
+      "path": "run_protocol.reset.memory",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::run_protocol.reset.workspace",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "workspace",
+      "path": "run_protocol.reset.workspace",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::run_protocol.scenario_ordering",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "scenario_ordering",
+      "path": "run_protocol.scenario_ordering",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::run_protocol.termination",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "termination",
+      "path": "run_protocol.termination",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::run_protocol.termination.timeout_seconds",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "timeout_seconds",
+      "path": "run_protocol.termination.timeout_seconds",
+      "types": [
+        "integer"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "scenarios",
+      "path": "scenarios",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].description",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "description",
+      "path": "scenarios[].description",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].environment",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "environment",
+      "path": "scenarios[].environment",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].environment.configuration",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "configuration",
+      "path": "scenarios[].environment.configuration",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].environment.configuration.repository_mode",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "repository_mode",
+      "path": "scenarios[].environment.configuration.repository_mode",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].environment.fixture",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "fixture",
+      "path": "scenarios[].environment.fixture",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].id",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "id",
+      "path": "scenarios[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].opportunities",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "opportunities",
+      "path": "scenarios[].opportunities",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].opportunities[].check_id",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "check_id",
+      "path": "scenarios[].opportunities[].check_id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].opportunities[].id",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "id",
+      "path": "scenarios[].opportunities[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].opportunities[].requirement_id",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "requirement_id",
+      "path": "scenarios[].opportunities[].requirement_id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].task",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "task",
+      "path": "scenarios[].task",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].task.output_semantics",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "output_semantics",
+      "path": "scenarios[].task.output_semantics",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].task.output_semantics.structured_object",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "structured_object",
+      "path": "scenarios[].task.output_semantics.structured_object",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].task.output_semantics.structured_object.accepted_presentations",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "accepted_presentations",
+      "path": "scenarios[].task.output_semantics.structured_object.accepted_presentations",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].task.output_semantics.structured_object.evidence_id",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "evidence_id",
+      "path": "scenarios[].task.output_semantics.structured_object.evidence_id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].task.output_semantics.structured_object.payload_path",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "payload_path",
+      "path": "scenarios[].task.output_semantics.structured_object.payload_path",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].task.output_semantics.structured_object.required_payload_keys",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "required_payload_keys",
+      "path": "scenarios[].task.output_semantics.structured_object.required_payload_keys",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::scenarios[].task.prompt",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "prompt",
+      "path": "scenarios[].task.prompt",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::schema_version",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "schema_version",
+      "path": "schema_version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::subjects",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "subjects",
+      "path": "subjects",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::subjects[].agent",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "agent",
+      "path": "subjects[].agent",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::subjects[].agent.name",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "name",
+      "path": "subjects[].agent.name",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::subjects[].agent.version",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "version",
+      "path": "subjects[].agent.version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::subjects[].configuration",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "configuration",
+      "path": "subjects[].configuration",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::subjects[].configuration.context_window",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "context_window",
+      "path": "subjects[].configuration.context_window",
+      "types": [
+        "integer"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::subjects[].id",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "id",
+      "path": "subjects[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::subjects[].model",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "model",
+      "path": "subjects[].model",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::subjects[].model.name",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "name",
+      "path": "subjects[].model.name",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml::field::subjects[].model.provider",
+      "documentId": "experiments:package:github_mcp_project_workspace_v1:experiment.yaml",
+      "packageId": "experiments:package:github_mcp_project_workspace_v1",
+      "name": "provider",
+      "path": "subjects[].model.provider",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "github_mcp_project_workspace_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml::field::contract",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "contract",
+      "path": "contract",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml::field::experiment_id",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "experiment_id",
+      "path": "experiment_id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml::field::runtime",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "runtime",
+      "path": "runtime",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml::field::runtime.api_version",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "api_version",
+      "path": "runtime.api_version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml::field::runtime.entrypoint",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "entrypoint",
+      "path": "runtime.entrypoint",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml::field::runtime.root",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "root",
+      "path": "runtime.root",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml::field::schema_version",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment-package.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "schema_version",
+      "path": "schema_version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment-package.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::checks",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "checks",
+      "path": "checks",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::checks[].evaluator",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "evaluator",
+      "path": "checks[].evaluator",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::checks[].id",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "id",
+      "path": "checks[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::evidence_policy",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "evidence_policy",
+      "path": "evidence_policy",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::evidence_policy.capture",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "capture",
+      "path": "evidence_policy.capture",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::experiment",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "experiment",
+      "path": "experiment",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::experiment.description",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "description",
+      "path": "experiment.description",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::experiment.id",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "id",
+      "path": "experiment.id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::experiment.title",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "title",
+      "path": "experiment.title",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::requirements",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "requirements",
+      "path": "requirements",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::requirements[].applicability",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "applicability",
+      "path": "requirements[].applicability",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::requirements[].compliance",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "compliance",
+      "path": "requirements[].compliance",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::requirements[].dimension",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "dimension",
+      "path": "requirements[].dimension",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::requirements[].id",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "id",
+      "path": "requirements[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::requirements[].statement",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "statement",
+      "path": "requirements[].statement",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::run_protocol",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "run_protocol",
+      "path": "run_protocol",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::run_protocol.ordering",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "ordering",
+      "path": "run_protocol.ordering",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::run_protocol.pacing",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "pacing",
+      "path": "run_protocol.pacing",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::run_protocol.pacing.inter_run_delay_seconds",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "inter_run_delay_seconds",
+      "path": "run_protocol.pacing.inter_run_delay_seconds",
+      "types": [
+        "number"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::run_protocol.repetitions",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "repetitions",
+      "path": "run_protocol.repetitions",
+      "types": [
+        "integer"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::run_protocol.reset",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "reset",
+      "path": "run_protocol.reset",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::run_protocol.reset.conversation",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "conversation",
+      "path": "run_protocol.reset.conversation",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::run_protocol.reset.environment",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "environment",
+      "path": "run_protocol.reset.environment",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::run_protocol.reset.memory",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "memory",
+      "path": "run_protocol.reset.memory",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::run_protocol.reset.workspace",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "workspace",
+      "path": "run_protocol.reset.workspace",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::run_protocol.scenario_ordering",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "scenario_ordering",
+      "path": "run_protocol.scenario_ordering",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::run_protocol.termination",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "termination",
+      "path": "run_protocol.termination",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::run_protocol.termination.timeout_seconds",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "timeout_seconds",
+      "path": "run_protocol.termination.timeout_seconds",
+      "types": [
+        "integer"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "scenarios",
+      "path": "scenarios",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].capabilities",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "capabilities",
+      "path": "scenarios[].capabilities",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].capabilities.tools",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "tools",
+      "path": "scenarios[].capabilities.tools",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].description",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "description",
+      "path": "scenarios[].description",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].id",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "id",
+      "path": "scenarios[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].opportunities",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "opportunities",
+      "path": "scenarios[].opportunities",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].opportunities[].check_id",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "check_id",
+      "path": "scenarios[].opportunities[].check_id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].opportunities[].id",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "id",
+      "path": "scenarios[].opportunities[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].opportunities[].requirement_id",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "requirement_id",
+      "path": "scenarios[].opportunities[].requirement_id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].task",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "task",
+      "path": "scenarios[].task",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].task.output_semantics",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "output_semantics",
+      "path": "scenarios[].task.output_semantics",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].task.output_semantics.scalar_fields",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "scalar_fields",
+      "path": "scenarios[].task.output_semantics.scalar_fields",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].task.output_semantics.scalar_fields[].accepted_serializations",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "accepted_serializations",
+      "path": "scenarios[].task.output_semantics.scalar_fields[].accepted_serializations",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].task.output_semantics.scalar_fields[].path",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "path",
+      "path": "scenarios[].task.output_semantics.scalar_fields[].path",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].task.output_semantics.scalar_fields[].semantic_type",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "semantic_type",
+      "path": "scenarios[].task.output_semantics.scalar_fields[].semantic_type",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].task.output_semantics.structured_object",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "structured_object",
+      "path": "scenarios[].task.output_semantics.structured_object",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].task.output_semantics.structured_object.accepted_presentations",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "accepted_presentations",
+      "path": "scenarios[].task.output_semantics.structured_object.accepted_presentations",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].task.output_semantics.structured_object.evidence_id",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "evidence_id",
+      "path": "scenarios[].task.output_semantics.structured_object.evidence_id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].task.output_semantics.structured_object.payload_path",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "payload_path",
+      "path": "scenarios[].task.output_semantics.structured_object.payload_path",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].task.output_semantics.structured_object.required_payload_keys",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "required_payload_keys",
+      "path": "scenarios[].task.output_semantics.structured_object.required_payload_keys",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::scenarios[].task.prompt",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "prompt",
+      "path": "scenarios[].task.prompt",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::schema_version",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "schema_version",
+      "path": "schema_version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::subjects",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "subjects",
+      "path": "subjects",
+      "types": [
+        "array"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::subjects[].agent",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "agent",
+      "path": "subjects[].agent",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::subjects[].agent.name",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "name",
+      "path": "subjects[].agent.name",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::subjects[].agent.version",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "version",
+      "path": "subjects[].agent.version",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::subjects[].configuration",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "configuration",
+      "path": "subjects[].configuration",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::subjects[].configuration.context_window",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "context_window",
+      "path": "subjects[].configuration.context_window",
+      "types": [
+        "integer"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::subjects[].id",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "id",
+      "path": "subjects[].id",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::subjects[].model",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "model",
+      "path": "subjects[].model",
+      "types": [
+        "object"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::subjects[].model.name",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "name",
+      "path": "subjects[].model.name",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
+    },
+    {
+      "id": "experiments:package:minimal_agent_baseline_v1:experiment.yaml::field::subjects[].model.provider",
+      "documentId": "experiments:package:minimal_agent_baseline_v1:experiment.yaml",
+      "packageId": "experiments:package:minimal_agent_baseline_v1",
+      "name": "provider",
+      "path": "subjects[].model.provider",
+      "types": [
+        "string"
+      ],
+      "sourceId": "experiments",
+      "sourceLabel": "Experiments",
+      "sourceRelativePath": "minimal_agent_baseline_v1/experiment.yaml"
     }
   ]
 }

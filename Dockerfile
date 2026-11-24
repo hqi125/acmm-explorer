@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 5173
 
-CMD ["sh", "-lc", "npm install --no-audit --no-fund && exec ./node_modules/.bin/vite --host 0.0.0.0"]
+CMD ["sh", "./scripts/container-bootstrap.sh", "./node_modules/.bin/vite", "--host", "0.0.0.0"]

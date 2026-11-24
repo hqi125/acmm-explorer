@@ -14,20 +14,21 @@ services:
       - acmm_explorer_node_modules:/workspace/node_modules
     environment:
       CHOKIDAR_USEPOLLING: "true"
-    command: sh -lc "npm install --no-audit --no-fund && exec ./node_modules/.bin/vite --host 0.0.0.0"
+    command: sh ./scripts/container-bootstrap.sh ./node_modules/.bin/vite --host 0.0.0.0
 
   reference-import:
     image: ${ACMM_EXPLORER_DEV_IMAGE:-acmm-explorer-dev:local}
     working_dir: /workspace
     volumes:
       - .:/workspace
+      - acmm_explorer_node_modules:/workspace/node_modules
       - ${ACMM_CORE_REPO:-../acmm_repo}:/sources/core:ro
       - ${ACMM_EXPERIMENTS_REPO:-../acmm_experiments}:/sources/experiments:ro
     environment:
       ACMM_CORE_SOURCE: /sources/core
       ACMM_EXPERIMENTS_SOURCE: /sources/experiments
       ACMM_REFERENCE_OUTPUT: /workspace/src/reference/generated/schema-catalog.json
-    command: node scripts/reference-import.mjs
+    command: sh ./scripts/container-bootstrap.sh node scripts/reference-import.mjs
 
 volumes:
   acmm_explorer_node_modules:

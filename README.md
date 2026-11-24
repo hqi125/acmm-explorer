@@ -2,7 +2,7 @@
 
 Local-only experiment-data explorer and usage reference for the Agent Compliance Metric Model (ACMM).
 
-ACMM Explorer is intentionally separate from the frozen ACMM research and experiment repositories. It is a local, read-only working interface: experiment outputs are opened locally, normalized by version-aware adapters, inspected through tables and visualizations, and linked back to their source evidence. The reference area provides a searchable lookup surface for ACMM commands, source JSON Schemas, observed data artifacts, fields, and project concepts.
+ACMM Explorer is intentionally separate from the frozen ACMM research and experiment repositories. It is a local, read-only working interface: experiment outputs are opened locally, normalized by version-aware adapters, inspected through tables and visualizations, and linked back to their source evidence. The reference area provides a searchable hierarchical lookup surface for ACMM commands, source JSON Schemas, experiment-package YAML, observed data artifacts, fields, and project concepts.
 
 ## Current status
 
@@ -25,7 +25,8 @@ The project now includes ACMM-aware export viewing plus a reusable Decision Work
 - Recipe-defined parameter controls with optional min/max/step metadata, procedural number/slider rendering, and optional parameter-group transforms such as sum-to-one normalization.
 - Versioned local decision-recipe JSON import/export (`acmm-explorer-decision-recipe/0.3`), with backward-compatible import of `0.1` and `0.2` recipes.
 - Failure-aware ingestion stages that mark the failed stage and block later stages visually.
-- Structured Reference catalog with distinct JSON Schema and observed-data-artifact filters, first-class field detail routes, source provenance, related-entry navigation, history controls, and copyable definition metadata.
+- Hierarchical Reference tree covering project-wide commands/concepts/JSON Schemas, experiment packages, package YAML fields, observed data artifacts, and first-class field detail routes with source provenance and browser history navigation.
+- Reference detail navigation toolbar is fixed outside the bounded detail scroll region, so Back/Forward/Copy Link remain visible while long definitions and field lists scroll independently.
 - No server-side storage, upload service, or external data processing.
 
 The Overview page still contains a visibly marked synthetic profile. The Data Explorer uses real exported analysis values once a supported ACMM export ZIP is opened. Generated R plot images inside an export are inventoried but are not used by Explorer; frontend visualizations are rendered independently from the exported numeric tables. Raw execution-result folders are intentionally outside the viewer's scope.
@@ -38,6 +39,8 @@ From the repository root:
 ./scripts/dev.sh
 ```
 
+Both the Explorer service and the one-shot reference importer mount the same Docker-managed `node_modules` volume and reconcile dependencies from `package.json` before starting. This keeps source bind mounts from hiding image-installed Node packages and makes `./scripts/dev.sh --build` safe after dependency changes.
+
 Then open:
 
 ```text
@@ -46,7 +49,7 @@ http://localhost:5173
 
 `dev.sh` performs the local startup jobs in order:
 
-1. If both sibling ACMM source repositories are available, regenerate the source-backed JSON Schema reference catalog.
+1. If both sibling ACMM source repositories are available, regenerate the source-backed reference catalog (Core JSON Schemas plus Experiment package YAML).
 2. Ensure one shared local Explorer dev image exists; ordinary launches reuse it instead of rebuilding.
 3. Run the normal `docker compose up explorer` service lifecycle.
 4. Install/reconcile frontend dependencies inside the named `node_modules` volume.
@@ -68,7 +71,7 @@ To start the site without refreshing the reference catalog:
 ./scripts/dev.sh --skip-reference
 ```
 
-### Source-generated schema reference
+### Source-generated reference catalog
 
 The default sibling-repository layout under `~/` is:
 
@@ -87,7 +90,7 @@ From the Explorer repository root the defaults are therefore:
 
 `.env.example` documents those paths as `ACMM_CORE_REPO` and `ACMM_EXPERIMENTS_REPO`. Relative values are normalized lexically from the logical Explorer path before any symlink is followed; for the default WSL layout this yields `/home/<user>/acmm_repo` and `/home/<user>/acmm_experiments`. Absolute paths are also accepted.
 
-Generate the schema book explicitly with:
+Generate the source-backed reference catalog explicitly with:
 
 ```bash
 ./scripts/reference-import.sh
@@ -95,13 +98,13 @@ Generate the schema book explicitly with:
 
 The importer also reuses the shared local dev image. Use `./scripts/reference-import.sh --build` only when an explicit image rebuild is wanted.
 
-The helper resolves the source paths on the host, mounts both repositories read-only into a disposable `reference-import` container, discovers JSON Schema documents, resolves local/relative `$ref` targets where possible, and writes:
+The helper resolves the source paths on the host and mounts both repositories read-only into a disposable `reference-import` container. It discovers JSON Schema documents across the source trees and, in the Experiments repository, exact package-root files named `experiment.yaml` and `experiment-package.yaml`. JSON Schema `$ref` targets are resolved locally where possible. The importer writes:
 
 ```text
 src/reference/generated/schema-catalog.json
 ```
 
-The generated catalog contains source-repository/commit provenance, schema file SHA-256 values, schema metadata, and searchable property records including nested object/array fields and fields declared inside `$defs` / `definitions`. The running website reads only the generated catalog; it does not require the Core or Experiments repositories at runtime.
+The generated catalog contains source-repository/commit provenance, JSON Schema file SHA-256 values, schema metadata, searchable property records including nested object/array fields and fields declared inside `$defs` / `definitions`, plus experiment-package roots, package YAML file hashes, and searchable nested YAML field paths. Experiment package YAML is treated as concrete schema-consuming source configuration rather than as JSON Schema definitions. The running website reads only the generated catalog; it does not require the Core or Experiments repositories at runtime.
 
 `./scripts/dev.sh` invokes the importer in `--if-available` mode. If either sibling repository is absent, startup continues with the last committed generated catalog.
 
@@ -234,3 +237,18 @@ Generated source data and observed export data are intentionally separate: the g
 
 Reference entries now distinguish source-generated `JSON Schema` definitions from observed YAML/CSV `Data Artifact` structures. Every generated or observed field is a first-class searchable `Field` entry with its own `#/reference/<entry-id>` route. Schema/artifact field lists navigate by clicking the field row itself; the old `Open` action is removed. Reference navigation writes browser history entries and exposes Back, Forward, and Copy link controls so direct field links and related-entry traversal remain consistent. Observed fields retain their artifact provenance, while generated fields retain JSON Schema source/constraint provenance.
 
+
+
+## v0.20 hierarchical reference tree and experiment packages
+
+The Reference browser now uses a hierarchical tree instead of a flat filtered list. Project-wide material is grouped under `Project reference` (commands, concepts, and source-generated JSON Schemas); experiment-specific material is grouped under `Experiments` (package sources and analyzed export artifacts); Explorer-local concepts have their own branch. JSON Schema fields, observed artifact fields, and package YAML fields remain first-class addressable detail entries, but their branches are collapsed by default so the 2,000+ field catalog stays compact. Search filters the tree to matching entries plus their ancestors and automatically exposes the matching branches.
+
+The source importer now scans the Experiments repository for exact package-root filenames `experiment.yaml` and `experiment-package.yaml`. Files in the same directory are grouped into one experiment-package entry. Their nested YAML paths are indexed generically without assuming experiment-specific field names, including object fields and fields found inside arrays of objects. Package YAML is recorded as source configuration with repository commit, relative path, file SHA-256, inferred value types, and package provenance; it is not presented as a JSON Schema definition.
+
+### v0.20.2 Reference navigation cleanup
+
+The Reference tree uses compact one-line entries without redundant type badges, summaries, or source-status dots. On desktop, the tree and detail panes share a bounded height and scroll independently; large schema/package field collections are also bounded and scroll inside the detail view. Reference Back/Forward follows the order of visited Reference entries, not parent/child hierarchy.
+
+### Reference search refinements (v0.20.4)
+
+Field detail pages can seed a related-field search in the left hierarchy. The advanced search disclosure supports name/path-only matching, source-file exclusions, and top-level hierarchy exclusions. The fixed detail toolbar remains outside the scrollable content body, with added spacing before detail content.

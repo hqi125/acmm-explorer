@@ -3,9 +3,11 @@
 import { createHash } from "node:crypto";
 import { readFile, readdir, mkdir, writeFile, stat } from "node:fs/promises";
 import path from "node:path";
+import { parse as parseYaml } from "yaml";
 
 const OUTPUT_PATH = path.resolve(process.env.ACMM_REFERENCE_OUTPUT ?? "src/reference/generated/schema-catalog.json");
-const CATALOG_SCHEMA = "acmm-explorer-schema-catalog/0.1";
+const CATALOG_SCHEMA = "acmm-explorer-schema-catalog/0.2";
+const PACKAGE_YAML_NAMES = new Set(["experiment.yaml", "experiment-package.yaml"]);
 
 const SOURCE_DEFINITIONS = [
   {
@@ -78,7 +80,7 @@ function looksLikeJsonSchema(document, relativePath)
   return keywordCount >= 2 && (document.type !== undefined || document.$id !== undefined);
 }
 
-async function walkJsonFiles(root)
+async function walkFiles(root, predicate)
 {
   const results = [];
 
@@ -98,17 +100,25 @@ async function walkJsonFiles(root)
         continue;
       }
 
-      if (!entry.isFile() || !entry.name.toLowerCase().endsWith(".json"))
+      if (entry.isFile() && predicate(entry.name, current))
       {
-        continue;
+        results.push(path.join(current, entry.name));
       }
-
-      results.push(path.join(current, entry.name));
     }
   }
 
   await walk(root);
   return results;
+}
+
+async function walkJsonFiles(root)
+{
+  return walkFiles(root, (name) => name.toLowerCase().endsWith(".json"));
+}
+
+async function walkPackageYamlFiles(root)
+{
+  return walkFiles(root, (name) => PACKAGE_YAML_NAMES.has(name.toLowerCase()));
 }
 
 async function readGitCommit(repoRoot)
@@ -356,6 +366,101 @@ function pointerEscape(value)
   return value.replace(/~/g, "~0").replace(/\//g, "~1");
 }
 
+function yamlValueType(value)
+{
+  if (value === null)
+  {
+    return "null";
+  }
+  if (Array.isArray(value))
+  {
+    return "array";
+  }
+  if (isPlainObject(value))
+  {
+    return "object";
+  }
+  if (typeof value === "number")
+  {
+    return Number.isInteger(value) ? "integer" : "number";
+  }
+  return typeof value;
+}
+
+function collectYamlFields(documentRecord, document)
+{
+  const fields = new Map();
+
+  function recordField(name, fieldPath, value)
+  {
+    const type = yamlValueType(value);
+    const existing = fields.get(fieldPath);
+    if (existing)
+    {
+      if (!existing.types.includes(type))
+      {
+        existing.types.push(type);
+      }
+      return existing;
+    }
+
+    const field = {
+      id: `${documentRecord.id}::field::${fieldPath}`,
+      documentId: documentRecord.id,
+      packageId: documentRecord.packageId,
+      name,
+      path: fieldPath,
+      types: [type],
+    };
+    fields.set(fieldPath, field);
+    return field;
+  }
+
+  function visit(value, currentPath)
+  {
+    if (isPlainObject(value))
+    {
+      for (const [key, child] of Object.entries(value))
+      {
+        const childPath = currentPath.length > 0 ? `${currentPath}.${key}` : key;
+        recordField(key, childPath, child);
+        if (Array.isArray(child))
+        {
+          for (const item of child)
+          {
+            visit(item, `${childPath}[]`);
+          }
+        }
+        else if (isPlainObject(child))
+        {
+          visit(child, childPath);
+        }
+      }
+      return;
+    }
+
+    if (Array.isArray(value))
+    {
+      for (const item of value)
+      {
+        visit(item, `${currentPath}[]`);
+      }
+    }
+  }
+
+  visit(document, "");
+  return [...fields.values()].sort((left, right) => left.path.localeCompare(right.path));
+}
+
+function packageLabel(relativeRoot)
+{
+  if (relativeRoot === "." || relativeRoot.length === 0)
+  {
+    return "experiment-package-root";
+  }
+  return path.posix.basename(relativeRoot);
+}
+
 function stringifyValue(value)
 {
   if (value === undefined)
@@ -491,6 +596,7 @@ async function loadSource(source)
   }
 
   const jsonPaths = await walkJsonFiles(source.root);
+  const packageYamlPaths = source.id === "experiments" ? await walkPackageYamlFiles(source.root) : [];
   const documents = new Map();
   for (const absolutePath of jsonPaths)
   {
@@ -511,6 +617,9 @@ async function loadSource(source)
   const schemas = [];
   const fields = [];
   const definitions = [];
+  const packagesById = new Map();
+  const packageDocuments = [];
+  const packageFields = [];
 
   for (const [absolutePath, loaded] of documents.entries())
   {
@@ -565,9 +674,70 @@ async function loadSource(source)
     definitions.push(...schemaDefinitions.map((definition) => ({ ...definition, schemaId: schemaRecord.id, sourceId: source.id, sourceLabel: source.label, sourceRelativePath: relativePath })));
   }
 
+  for (const absolutePath of packageYamlPaths)
+  {
+    try
+    {
+      const raw = await readFile(absolutePath);
+      const document = parseYaml(raw.toString("utf8"));
+      const relativePath = toPosix(path.relative(source.root, absolutePath));
+      const relativeRoot = toPosix(path.relative(source.root, path.dirname(absolutePath))) || ".";
+      const packageId = `${source.id}:package:${relativeRoot}`;
+      const documentId = `${packageId}:${path.basename(relativePath)}`;
+      const documentRecord = {
+        id: documentId,
+        packageId,
+        sourceId: source.id,
+        sourceLabel: source.label,
+        relativeRoot,
+        relativePath,
+        fileName: path.basename(relativePath),
+        fileSha256: sha256(raw),
+        topLevelKeys: isPlainObject(document) ? Object.keys(document).sort() : [],
+        fieldCount: 0,
+      };
+      const documentFields = collectYamlFields(documentRecord, document);
+      documentRecord.fieldCount = documentFields.length;
+      packageDocuments.push(documentRecord);
+      packageFields.push(...documentFields.map((field) => ({
+        ...field,
+        sourceId: source.id,
+        sourceLabel: source.label,
+        sourceRelativePath: relativePath,
+      })));
+
+      const packageRecord = packagesById.get(packageId) ?? {
+        id: packageId,
+        sourceId: source.id,
+        sourceLabel: source.label,
+        relativeRoot,
+        label: packageLabel(relativeRoot),
+        documentIds: [],
+        fieldCount: 0,
+      };
+      packageRecord.documentIds.push(documentId);
+      packageRecord.fieldCount += documentFields.length;
+      packagesById.set(packageId, packageRecord);
+    }
+    catch (error)
+    {
+      const relativePath = toPosix(path.relative(source.root, absolutePath));
+      console.warn(`  Warning: package YAML skipped (${relativePath}): ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  const packages = [...packagesById.values()].map((record) => ({
+    ...record,
+    documentIds: [...record.documentIds].sort(),
+    documentCount: record.documentIds.length,
+  }));
+
   schemas.sort((left, right) => left.relativePath.localeCompare(right.relativePath));
   fields.sort((left, right) => left.schemaId.localeCompare(right.schemaId) || left.path.localeCompare(right.path));
   definitions.sort((left, right) => left.schemaId.localeCompare(right.schemaId) || left.name.localeCompare(right.name));
+  packages.sort((left, right) => left.relativeRoot.localeCompare(right.relativeRoot));
+  packageDocuments.sort((left, right) => left.relativePath.localeCompare(right.relativePath));
+  packageFields.sort((left, right) => left.documentId.localeCompare(right.documentId) || left.path.localeCompare(right.path));
 
   return {
     source: {
@@ -576,10 +746,16 @@ async function loadSource(source)
       commit,
       schemaCount: schemas.length,
       fieldCount: fields.length,
+      packageCount: packages.length,
+      packageDocumentCount: packageDocuments.length,
+      packageFieldCount: packageFields.length,
     },
     schemas,
     fields,
     definitions,
+    packages,
+    packageDocuments,
+    packageFields,
   };
 }
 
@@ -598,6 +774,9 @@ async function main()
     schemas: sourceResults.flatMap((result) => result.schemas),
     fields: sourceResults.flatMap((result) => result.fields),
     definitions: sourceResults.flatMap((result) => result.definitions),
+    packages: sourceResults.flatMap((result) => result.packages),
+    packageDocuments: sourceResults.flatMap((result) => result.packageDocuments),
+    packageFields: sourceResults.flatMap((result) => result.packageFields),
   };
 
   await mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
@@ -605,11 +784,14 @@ async function main()
 
   const schemaCount = catalog.schemas.length;
   const fieldCount = catalog.fields.length;
-  console.log(`Reference catalog generated: ${schemaCount} schema(s), ${fieldCount} field(s).`);
+  const packageCount = catalog.packages.length;
+  const packageDocumentCount = catalog.packageDocuments.length;
+  const packageFieldCount = catalog.packageFields.length;
+  console.log(`Reference catalog generated: ${schemaCount} schema(s), ${fieldCount} schema field(s), ${packageCount} experiment package(s), ${packageDocumentCount} package YAML file(s), ${packageFieldCount} package field(s).`);
   for (const source of catalog.sources)
   {
     const commit = source.commit ? source.commit.slice(0, 12) : "unknown commit";
-    console.log(`  ${source.label}: ${source.schemaCount} schema(s), ${source.fieldCount} field(s), ${commit}`);
+    console.log(`  ${source.label}: ${source.schemaCount} schema(s), ${source.fieldCount} schema field(s), ${source.packageCount} package(s), ${source.packageDocumentCount} package YAML file(s), ${source.packageFieldCount} package field(s), ${commit}`);
   }
   console.log(`  Output: ${path.relative(process.cwd(), OUTPUT_PATH)}`);
 }

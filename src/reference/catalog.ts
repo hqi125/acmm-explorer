@@ -1,7 +1,7 @@
 import generatedSchemaCatalog from "./generated/schema-catalog.json";
 
-export type ReferenceKind = "Command" | "Schema" | "Artifact" | "Field" | "Concept";
-export type ReferenceSourceStatus = "observed-export" | "project-context" | "explorer-local" | "generated-schema";
+export type ReferenceKind = "Command" | "Schema" | "Artifact" | "Package" | "Yaml" | "Field" | "Concept";
+export type ReferenceSourceStatus = "observed-export" | "project-context" | "explorer-local" | "generated-schema" | "generated-package";
 
 export interface ReferenceField
 {
@@ -34,6 +34,8 @@ export interface ReferenceEntry
   notes?: string[];
   metadata?: ReferenceMetadata[];
   related?: string[];
+  navigationGroup?: string[];
+  navigationParentId?: string;
 }
 
 const observedBoth = "Observed in both supplied analyzed export packages (legacy run export schema 0.1 and current campaign export schema 0.3).";
@@ -497,6 +499,9 @@ interface GeneratedCatalogSource
   commit: string | null;
   schemaCount: number;
   fieldCount: number;
+  packageCount?: number;
+  packageDocumentCount?: number;
+  packageFieldCount?: number;
 }
 
 interface GeneratedCatalogSchema
@@ -538,6 +543,45 @@ interface GeneratedCatalogField
   constraints: Record<string, unknown>;
 }
 
+interface GeneratedCatalogPackage
+{
+  id: string;
+  sourceId: string;
+  sourceLabel: string;
+  relativeRoot: string;
+  label: string;
+  documentIds: string[];
+  documentCount: number;
+  fieldCount: number;
+}
+
+interface GeneratedCatalogPackageDocument
+{
+  id: string;
+  packageId: string;
+  sourceId: string;
+  sourceLabel: string;
+  relativeRoot: string;
+  relativePath: string;
+  fileName: string;
+  fileSha256: string;
+  topLevelKeys: string[];
+  fieldCount: number;
+}
+
+interface GeneratedCatalogPackageField
+{
+  id: string;
+  documentId: string;
+  packageId: string;
+  sourceId: string;
+  sourceLabel: string;
+  sourceRelativePath: string;
+  name: string;
+  path: string;
+  types: string[];
+}
+
 interface GeneratedCatalog
 {
   schemaVersion: string;
@@ -545,11 +589,20 @@ interface GeneratedCatalog
   sources: GeneratedCatalogSource[];
   schemas: GeneratedCatalogSchema[];
   fields: GeneratedCatalogField[];
+  packages?: GeneratedCatalogPackage[];
+  packageDocuments?: GeneratedCatalogPackageDocument[];
+  packageFields?: GeneratedCatalogPackageField[];
 }
 
 const generatedCatalog = generatedSchemaCatalog as GeneratedCatalog;
 const generatedSchemaEntryId = (schemaId: string) => `generated-schema:${schemaId}`;
 const generatedFieldEntryId = (fieldId: string) => `generated-field:${fieldId}`;
+const generatedPackageEntryId = (packageId: string) => `generated-package:${packageId}`;
+const generatedPackageDocumentEntryId = (documentId: string) => `generated-package-yaml:${documentId}`;
+const generatedPackageFieldEntryId = (fieldId: string) => `generated-package-field:${fieldId}`;
+const generatedPackages = generatedCatalog.packages ?? [];
+const generatedPackageDocuments = generatedCatalog.packageDocuments ?? [];
+const generatedPackageFields = generatedCatalog.packageFields ?? [];
 
 function displayValue(value: unknown)
 {
@@ -580,6 +633,17 @@ for (const field of generatedCatalog.fields)
   fieldsBySchema.set(field.schemaId, list);
 }
 
+function sourceNavigationRoot(sourceId: string)
+{
+  return sourceId === "experiments" ? "Experiments" : "Project reference";
+}
+
+function directorySegments(relativePath: string)
+{
+  const segments = relativePath.split("/").filter((segment) => segment.length > 0);
+  return segments.slice(0, -1);
+}
+
 const generatedSchemaEntries: ReferenceEntry[] = generatedCatalog.schemas.map((schema) =>
 {
   const fields = fieldsBySchema.get(schema.id) ?? [];
@@ -606,6 +670,7 @@ const generatedSchemaEntries: ReferenceEntry[] = generatedCatalog.schemas.map((s
       { label: "Definitions", value: String(schema.definitionCount) },
       { label: "File SHA-256", value: schema.fileSha256 },
     ],
+    navigationGroup: [sourceNavigationRoot(schema.sourceId), "JSON Schemas", schema.sourceLabel, ...directorySegments(schema.relativePath)],
   };
 });
 
@@ -657,6 +722,100 @@ const generatedFieldEntries: ReferenceEntry[] = generatedCatalog.fields.map((fie
     aliases: [field.name, field.path, field.pointer, field.sourceRelativePath, schema?.title ?? ""].filter((value) => value.length > 0),
     metadata,
     related: [generatedSchemaEntryId(field.schemaId)],
+    navigationParentId: generatedSchemaEntryId(field.schemaId),
+  };
+});
+
+const packageDocumentsByPackage = new Map<string, GeneratedCatalogPackageDocument[]>();
+for (const document of generatedPackageDocuments)
+{
+  const list = packageDocumentsByPackage.get(document.packageId) ?? [];
+  list.push(document);
+  packageDocumentsByPackage.set(document.packageId, list);
+}
+
+const packageFieldsByDocument = new Map<string, GeneratedCatalogPackageField[]>();
+for (const field of generatedPackageFields)
+{
+  const list = packageFieldsByDocument.get(field.documentId) ?? [];
+  list.push(field);
+  packageFieldsByDocument.set(field.documentId, list);
+}
+
+const generatedPackageEntries: ReferenceEntry[] = generatedPackages.map((packageRecord) =>
+{
+  const documents = packageDocumentsByPackage.get(packageRecord.id) ?? [];
+  return {
+    id: generatedPackageEntryId(packageRecord.id),
+    kind: "Package",
+    name: packageRecord.label,
+    summary: `Experiment package source imported from ${packageRecord.relativeRoot}.`,
+    sourceStatus: "generated-package",
+    sourceLabel: `${packageRecord.sourceLabel} package`,
+    sourceNote: generatedSourceNote(packageRecord.sourceId),
+    aliases: [packageRecord.relativeRoot, packageRecord.label],
+    metadata: [
+      { label: "Source repository", value: packageRecord.sourceLabel },
+      { label: "Package root", value: packageRecord.relativeRoot },
+      { label: "Package YAML files", value: String(packageRecord.documentCount) },
+      { label: "Observed package fields", value: String(packageRecord.fieldCount) },
+    ],
+    related: documents.map((document) => generatedPackageDocumentEntryId(document.id)),
+    navigationGroup: ["Experiments", "Packages"],
+  };
+});
+
+const generatedPackageDocumentEntries: ReferenceEntry[] = generatedPackageDocuments.map((document) =>
+{
+  const packageRecord = generatedPackages.find((candidate) => candidate.id === document.packageId);
+  const fields = packageFieldsByDocument.get(document.id) ?? [];
+  return {
+    id: generatedPackageDocumentEntryId(document.id),
+    kind: "Yaml",
+    name: document.fileName,
+    summary: `Experiment package YAML source file from ${document.relativePath}.`,
+    sourceStatus: "generated-package",
+    sourceLabel: `${document.sourceLabel} package YAML`,
+    sourceNote: generatedSourceNote(document.sourceId),
+    aliases: [document.relativePath, document.fileName, packageRecord?.label ?? "", ...document.topLevelKeys],
+    fields: fields.map((field) => ({
+      name: field.path,
+      description: field.types.length > 0 ? field.types.join(" | ") : "observed package field",
+      entryId: generatedPackageFieldEntryId(field.id),
+    })),
+    metadata: [
+      { label: "Source repository", value: document.sourceLabel },
+      { label: "Experiment package", value: packageRecord?.label ?? document.relativeRoot },
+      { label: "Source file", value: document.relativePath },
+      { label: "Fields", value: String(document.fieldCount) },
+      { label: "File SHA-256", value: document.fileSha256 },
+    ],
+    related: [generatedPackageEntryId(document.packageId)],
+    navigationParentId: generatedPackageEntryId(document.packageId),
+  };
+});
+
+const generatedPackageFieldEntries: ReferenceEntry[] = generatedPackageFields.map((field) =>
+{
+  const document = generatedPackageDocuments.find((candidate) => candidate.id === field.documentId);
+  const packageRecord = generatedPackages.find((candidate) => candidate.id === field.packageId);
+  return {
+    id: generatedPackageFieldEntryId(field.id),
+    kind: "Field",
+    name: field.path,
+    summary: `Observed source field in ${document?.fileName ?? field.sourceRelativePath}.`,
+    sourceStatus: "generated-package",
+    sourceLabel: `${field.sourceLabel} package field`,
+    sourceNote: generatedSourceNote(field.sourceId),
+    aliases: [field.name, field.path, field.sourceRelativePath, packageRecord?.label ?? ""],
+    metadata: [
+      { label: "YAML path", value: field.path },
+      { label: "Type", value: field.types.length > 0 ? field.types.join(" | ") : "unspecified" },
+      { label: "Experiment package", value: packageRecord?.label ?? field.packageId },
+      { label: "Source file", value: field.sourceRelativePath },
+    ],
+    related: [generatedPackageDocumentEntryId(field.documentId), generatedPackageEntryId(field.packageId)],
+    navigationParentId: generatedPackageDocumentEntryId(field.documentId),
   };
 });
 
@@ -666,7 +825,27 @@ export const schemaCatalogInfo = {
   sources: generatedCatalog.sources,
   schemaCount: generatedCatalog.schemas.length,
   fieldCount: generatedCatalog.fields.length,
+  packageCount: generatedPackages.length,
+  packageDocumentCount: generatedPackageDocuments.length,
+  packageFieldCount: generatedPackageFields.length,
 };
+
+function curatedNavigationGroup(entry: ReferenceEntry)
+{
+  if (entry.kind === "Artifact")
+  {
+    return ["Experiments", "Export / analysis artifacts"];
+  }
+  if (entry.kind === "Command")
+  {
+    return ["Project reference", "Commands"];
+  }
+  if (entry.kind === "Concept")
+  {
+    return entry.sourceStatus === "explorer-local" ? ["Explorer", "Concepts"] : ["Project reference", "Concepts"];
+  }
+  return ["Project reference", "Other"];
+}
 
 function observedFieldEntryId(parentId: string, index: number)
 {
@@ -674,8 +853,9 @@ function observedFieldEntryId(parentId: string, index: number)
 }
 
 const observedFieldEntries: ReferenceEntry[] = [];
-const curatedEntriesWithFieldLinks: ReferenceEntry[] = curatedReferenceEntries.map((entry) =>
+const curatedEntriesWithFieldLinks: ReferenceEntry[] = curatedReferenceEntries.map((sourceEntry) =>
 {
+  const entry: ReferenceEntry = { ...sourceEntry, navigationGroup: curatedNavigationGroup(sourceEntry) };
   if (entry.kind !== "Artifact" || !entry.fields || entry.fields.length === 0)
   {
     return entry;
@@ -698,6 +878,7 @@ const curatedEntriesWithFieldLinks: ReferenceEntry[] = curatedReferenceEntries.m
         { label: "Observed artifact", value: entry.name },
       ],
       related: [entry.id],
+      navigationParentId: entry.id,
     });
     return { ...field, entryId: fieldId };
   });
@@ -710,6 +891,9 @@ export const referenceEntries: ReferenceEntry[] = [
   ...observedFieldEntries,
   ...generatedSchemaEntries,
   ...generatedFieldEntries,
+  ...generatedPackageEntries,
+  ...generatedPackageDocumentEntries,
+  ...generatedPackageFieldEntries,
 ];
 
 export const referenceEntryById = new Map(referenceEntries.map((entry) => [entry.id, entry]));
