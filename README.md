@@ -25,7 +25,7 @@ The project now includes ACMM-aware export viewing plus a reusable Decision Work
 - Recipe-defined parameter controls with optional min/max/step metadata, procedural number/slider rendering, and optional parameter-group transforms such as sum-to-one normalization.
 - Versioned local decision-recipe JSON import/export (`acmm-explorer-decision-recipe/0.3`), with backward-compatible import of `0.1` and `0.2` recipes.
 - Failure-aware ingestion stages that mark the failed stage and block later stages visually.
-- Reference-search shell for future generated CLI/schema documentation.
+- Structured Reference catalog with searchable command, schema/output, and concept entries, source-basis labels, related-entry navigation, observed field lists, and copyable command/field text.
 - No server-side storage, upload service, or external data processing.
 
 The Overview page still contains a visibly marked synthetic profile. The Data Explorer uses real exported analysis values once a supported ACMM export ZIP is opened. Generated R plot images inside an export are inventoried but are not used by Explorer; frontend visualizations are rendered independently from the exported numeric tables. Raw execution-result folders are intentionally outside the viewer's scope.
@@ -36,7 +36,7 @@ From the repository root:
 
 ```bash
 
-docker compose up --build
+./scripts/dev.sh
 ```
 
 Then open:
@@ -45,14 +45,30 @@ Then open:
 http://localhost:5173
 ```
 
-Stop the development service with `Ctrl+C`, then remove the container with:
-
-```bash
-
-docker compose down
-```
+Stop the development service with `Ctrl+C`. The one-off development container is started with `--rm`, so Docker removes that container automatically when it exits. The named `node_modules` volume is intentionally retained between runs so dependencies do not need to be rebuilt from scratch.
 
 The source tree is bind-mounted into the development container. `node_modules` is kept in a Docker named volume so frontend dependencies do not need to be installed into the host repository.
+
+### Disposable development container
+
+The helper script is equivalent to:
+
+```bash
+docker compose run --rm --build --service-ports explorer
+```
+
+`--service-ports` exposes the Vite port declared by the Compose service, and `--rm` removes the one-off container when the process exits. This is preferred over `docker compose up` for normal local use because stopped development containers are not retained.
+
+### Reference source repository paths
+
+The future schema-reference importer is designed around the normal sibling-repository layout under `~/`. From the `acmm_explorer` repository root, the default source locations are therefore:
+
+```text
+../acmm_repo
+../acmm_experiments
+```
+
+`.env.example` records these defaults as `ACMM_CORE_REPO` and `ACMM_EXPERIMENTS_REPO`. Relative values are interpreted from the Explorer repository root; absolute paths will also be accepted when the importer is implemented. Source repositories will be mounted read-only for catalog generation and will not be required by the running browser application.
 
 ## Optional host-native development
 
@@ -166,3 +182,8 @@ The Decision Workshop includes a saved-recipe comparison section below parameter
 ## v0.16 analyzed export detail views
 
 The normalized Data Explorer now exposes four linked analysis views for the selected analysis snapshot and subject: `Profile`, `Requirements`, `Availability`, and `Trajectory`. Requirements are read from exported `requirement_estimates.csv` / `requirement_intervals.csv` and can switch among available estimands. Availability uses scenario cells, subject intervals, and recorded failure-mode tables. Trajectory uses only exported trajectory subject/tool/run tables; older analyses without those tables display an explicit unavailable state rather than reconstructing behavior from raw run data. All charts remain frontend renderings of exported numeric tables, and table source links continue to jump to the corresponding file in the export inventory.
+
+
+## v0.17 reference catalog
+
+The Reference page is now a structured local catalog rather than placeholder cards. It separates three source bases: entries observed directly in the supplied analyzed export packages, project-context entries whose exhaustive frozen-source option/schema inventory is still pending, and Explorer-local concepts such as decision recipes. Observed CSV field lists are taken from the supplied Experiment 1 and Experiment 2 exports. Command entries intentionally avoid claiming an exhaustive option list until the frozen Core/experiment source repositories are imported. The catalog model lives in `src/reference/catalog.ts` so a future source importer can replace or enrich entries without coupling reference data to the React view.
