@@ -11,7 +11,7 @@ services:
       - acmm_explorer_node_modules:/workspace/node_modules
     environment:
       CHOKIDAR_USEPOLLING: "true"
-    command: npm run dev
+    command: sh -c "npm install && npm run dev"
 
 volumes:
   acmm_explorer_node_modules:

@@ -1,7 +1,7 @@
 {
   "name": "acmm-explorer",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.6.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
@@ -11,8 +11,11 @@
   },
   "dependencies": {
     "echarts": "6.1.0",
+    "fflate": "0.8.3",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "read-excel-file": "9.3.20",
+    "yaml": "2.9.1"
   },
   "devDependencies": {
     "@types/react": "19.3.0",

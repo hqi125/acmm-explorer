@@ -39,7 +39,7 @@ export function HomeView({ onNavigate }: HomeViewProps)
             <div>
               <span>Data</span>
               <strong>Local processing</strong>
-              <small>Selected experiment data remains in the local browser session.</small>
+              <small>One accepted export is retained in local browser storage for reuse across views.</small>
             </div>
             <div>
               <span>Traceability</span>

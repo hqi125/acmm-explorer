@@ -35,7 +35,7 @@ export function AppShell({ activeView, onNavigate, children }: AppShellProps)
           ))}
         </nav>
 
-        <div className="local-badge" title="Selected experiment data is intended to stay in this browser session.">
+        <div className="local-badge" title="Selected experiment data stays local to this browser; one accepted export may be cached locally.">
           <span className="status-dot" aria-hidden="true" />
           Local only
         </div>
