@@ -2,12 +2,13 @@ import { useState } from "react";
 import { AppShell } from "../components/AppShell";
 import { AboutView } from "../components/AboutView";
 import { HomeView } from "../components/HomeView";
+import { ExportSessionProvider } from "../data/session/ExportSession";
 import { ExplorerView } from "../explorer/ExplorerView";
 import { ReferenceView } from "../reference/ReferenceView";
 import { WorkshopView } from "../workshop/WorkshopView";
 import type { AppView } from "./navigation";
 
-export function App()
+function AppContent()
 {
   const [activeView, setActiveView] = useState<AppView>("home");
 
@@ -19,5 +20,14 @@ export function App()
       {activeView === "reference" && <ReferenceView />}
       {activeView === "about" && <AboutView />}
     </AppShell>
+  );
+}
+
+export function App()
+{
+  return (
+    <ExportSessionProvider>
+      <AppContent />
+    </ExportSessionProvider>
   );
 }

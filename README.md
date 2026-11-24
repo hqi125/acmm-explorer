@@ -16,6 +16,9 @@ The project now includes ACMM-aware export viewing plus a reusable Decision Work
 - Current `acmm campaign` export support for schema `0.3` with versioned `analysis_output/analysis_<id>/...` snapshots.
 - Explicit analysis-snapshot selection when an export contains multiple analyses, with a compact in-view switcher after loading.
 - Single-slot IndexedDB caching for one accepted export, including persisted analysis and subject selection plus an explicit clear-cache control.
+- Application-level export session shared across Overview, Data Explorer, and Decision Workshop, so cached restoration/normalization runs once instead of once per page.
+- Global loading status remains visible while shared export inspection/normalization continues across navigation; newer loads supersede stale in-flight work.
+- Dynamic Overview page with the active export summary and merged canonical GOBPFR radar only when a normalized analysis is available.
 - Real GOBPFR agent profiles rendered from exported `dimension_scores.csv` and `dimension_intervals.csv`.
 - Cross-agent dimension comparison rendered from the same selected analysis snapshot, with merged-radar and grouped-bar views.
 - Availability summaries and trajectory summaries when those analysis tables are present.
@@ -29,7 +32,7 @@ The project now includes ACMM-aware export viewing plus a reusable Decision Work
 - Reference detail navigation toolbar is fixed outside the bounded detail scroll region, so Back/Forward/Copy Link remain visible while long definitions and field lists scroll independently.
 - No server-side storage, upload service, or external data processing.
 
-The Overview page still contains a visibly marked synthetic profile. The Data Explorer uses real exported analysis values once a supported ACMM export ZIP is opened. Generated R plot images inside an export are inventoried but are not used by Explorer; frontend visualizations are rendered independently from the exported numeric tables. Raw execution-result folders are intentionally outside the viewer's scope.
+Overview now consumes the same shared normalized export session as Data Explorer and Decision Workshop. When an analysis is selected it shows the real merged canonical GOBPFR radar; when no export is active, no synthetic radar is shown. Generated R plot images inside an export are inventoried but are not used by Explorer; frontend visualizations are rendered independently from the exported numeric tables. Raw execution-result folders are intentionally outside the viewer's scope.
 
 ## Run locally with Docker
 
@@ -130,7 +133,7 @@ npm run build
 src/
   app/              application shell, navigation, global styles
   components/       shared and top-level views
-  data/             generic ingestion, package adapters, shared data types
+  data/             ingestion, package adapters, shared export session, cache, and data types
   explorer/         experiment-data exploration UI
   decision/         decision-function model, presets, store, and expression evaluator
   workshop/         decision workshop UI
@@ -252,3 +255,10 @@ The Reference tree uses compact one-line entries without redundant type badges, 
 ### Reference search refinements (v0.20.4)
 
 Field detail pages can seed a related-field search in the left hierarchy. The advanced search disclosure supports name/path-only matching, source-file exclusions, and top-level hierarchy exclusions. The fixed detail toolbar remains outside the scrollable content body, with added spacing before detail content.
+
+
+## v0.21 final workspace cleanup
+
+Overview, Data Explorer, and Decision Workshop now share one application-level export session. IndexedDB cache restoration, ZIP inspection, adapter detection, and normalization execute once at application scope and remain alive across top-navigation changes. A newer export load supersedes older asynchronous work so stale results cannot replace the current session. File-preview work remains page-local and uses request sequencing so superseded preview results are ignored.
+
+The top application shell exposes shared loading state without disabling navigation. Overview no longer contains synthetic compliance data: it displays the selected export/analysis and merged canonical radar only when normalized evidence is available, otherwise it presents a compact no-active-export state. About is reduced to project purpose, data lifecycle, evidence/decision boundaries, reference provenance, and local-only runtime scope.

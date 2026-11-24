@@ -1,113 +1,121 @@
+import { useMemo } from "react";
 import type { AppView } from "../app/navigation";
-import { ComplianceRadar } from "../visualization/ComplianceRadar";
+import { useExportSession } from "../data/session/ExportSession";
+import { ComplianceMultiRadar } from "../visualization/ComplianceMultiRadar";
 
 interface HomeViewProps
 {
   onNavigate: (view: AppView) => void;
 }
 
-const profileRows = [
-  ["Goal", "0.84", "+0.04"],
-  ["Obligation", "0.78", "+0.02"],
-  ["Boundary", "0.91", "+0.05"],
-  ["Procedure", "0.72", "-0.01"],
-  ["Fidelity", "0.86", "+0.03"],
-  ["Recovery", "0.67", "+0.07"],
-];
-
 export function HomeView({ onNavigate }: HomeViewProps)
 {
-  return (
-    <div className="page-stack">
-      <section className="hero-grid">
-        <div className="hero-copy">
-          <p className="eyebrow">ACMM Explorer</p>
-          <h1>Experiment data viewer and usage reference.</h1>
-          <p className="hero-lead">
-            Open generated ACMM data for inspection, compare agent results, and look up commands,
-            schemas, and project concepts from one local interface.
-          </p>
-          <div className="hero-actions">
-            <button className="button button-primary" type="button" onClick={() => onNavigate("explorer")}>
-              Open data explorer
-            </button>
-            <button className="button button-secondary" type="button" onClick={() => onNavigate("reference")}>
-              Open reference
-            </button>
-          </div>
-          <div className="principle-strip">
-            <div>
-              <span>Data</span>
-              <strong>Local processing</strong>
-              <small>One accepted export is retained in local browser storage for reuse across views.</small>
-            </div>
-            <div>
-              <span>Traceability</span>
-              <strong>Source-linked views</strong>
-              <small>Displayed values should remain traceable to source observations.</small>
-            </div>
-            <div>
-              <span>Scope</span>
-              <strong>Read-only use</strong>
-              <small>The explorer consumes outputs without modifying ACMM experiment infrastructure.</small>
-            </div>
-          </div>
-        </div>
+  const { dataset, selectedAnalysisId, busy, busyLabel, cacheInfo } = useExportSession();
+  const activeAnalysis = useMemo(
+    () => dataset?.analyses.find((analysis) => analysis.id === selectedAnalysisId) ?? null,
+    [dataset, selectedAnalysisId],
+  );
 
-        <article className="profile-card">
-          <div className="card-heading-row">
-            <div>
-              <p className="eyebrow">Example profile</p>
-              <h2>Example agent</h2>
-            </div>
-            <span className="tag tag-muted">Demo data</span>
-          </div>
-          <ComplianceRadar />
-          <div className="profile-table" aria-label="Example compliance profile values">
-            {profileRows.map(([name, value, delta]) => (
-              <div className="profile-row" key={name}>
-                <span>{name}</span>
-                <strong>{value}</strong>
-                <small className={delta.startsWith("-") ? "delta-negative" : "delta-positive"}>{delta}</small>
-              </div>
-            ))}
-          </div>
-          <p className="demo-note">
-            Synthetic values are used until a package adapter can load and trace real experiment observations.
+  return (
+    <div className="page-stack overview-page">
+      <section className="overview-heading">
+        <div>
+          <p className="eyebrow">Overview</p>
+          <h1>ACMM experiment workspace.</h1>
+          <p>
+            Inspect exported analysis, apply explicit decision functions, and look up source-backed
+            ACMM reference material from one local interface.
           </p>
-        </article>
+        </div>
+        <div className="overview-actions">
+          <button className="button button-primary" type="button" onClick={() => onNavigate("explorer")}>Data Explorer</button>
+          <button className="button button-secondary" type="button" onClick={() => onNavigate("reference")}>Reference</button>
+        </div>
       </section>
 
-      <section className="section-block">
-        <div className="section-heading">
+      {busy && (
+        <section className="overview-loading" role="status">
+          <span className="loading-spinner" aria-hidden="true" />
           <div>
-            <p className="eyebrow">Workspace</p>
-            <h2>Data inspection and project reference.</h2>
+            <strong>{busyLabel}</strong>
+            <small>The shared export session continues even if you navigate to another page.</small>
           </div>
-          <p>
-            These areas are separate for now. As real package and schema support is added, data views
-            can link directly to relevant field and command documentation.
-          </p>
-        </div>
+        </section>
+      )}
 
-        <div className="feature-grid">
-          <button className="feature-card feature-card-dark" type="button" onClick={() => onNavigate("explorer")}>
-            <span className="feature-index">Data</span>
+      {!busy && dataset === null && (
+        <section className="overview-empty">
+          <div>
+            <p className="eyebrow">Active export</p>
+            <h2>No experiment export is loaded.</h2>
+            <p>Open an ACMM export in Data Explorer. One accepted package can be cached locally and restored across pages and refreshes.</p>
+          </div>
+          <button className="button button-primary" type="button" onClick={() => onNavigate("explorer")}>Open export</button>
+        </section>
+      )}
+
+      {!busy && dataset !== null && activeAnalysis === null && (
+        <section className="overview-empty">
+          <div>
+            <p className="eyebrow">Active export</p>
+            <h2>{dataset.experimentId}</h2>
+            <p>This export contains multiple analyses. Select the analysis to use in Data Explorer before opening profile views.</p>
+          </div>
+          <button className="button button-primary" type="button" onClick={() => onNavigate("explorer")}>Select analysis</button>
+        </section>
+      )}
+
+      {!busy && dataset !== null && activeAnalysis !== null && (
+        <section className="overview-data-grid">
+          <article className="overview-export-card">
             <div>
-              <h3>Experiment data</h3>
-              <p>Load outputs, inspect agent profiles, compare scenarios, and drill down to run-level evidence.</p>
+              <p className="eyebrow">Active export</p>
+              <h2>{dataset.experimentId}</h2>
+              <p>{dataset.sourceKind === "campaign" ? "Campaign export" : "Run export"} / export schema {dataset.exportSchemaVersion}</p>
             </div>
-            <span className="feature-link">Open explorer</span>
-          </button>
-          <button className="feature-card" type="button" onClick={() => onNavigate("reference")}>
-            <span className="feature-index">Docs</span>
-            <div>
-              <h3>Usage reference</h3>
-              <p>Look up schema fields, CLI options, project concepts, defaults, examples, and source information.</p>
+            <dl className="overview-metadata">
+              <div><dt>Analysis</dt><dd>{activeAnalysis.label}</dd></div>
+              <div><dt>Plan schema</dt><dd>{activeAnalysis.planSchemaVersion ?? "legacy"}</dd></div>
+              <div><dt>Subjects</dt><dd>{activeAnalysis.subjects.length}</dd></div>
+              <div><dt>Profile</dt><dd>{activeAnalysis.profileEstimand} / {activeAnalysis.profileAggregationMethod} / {activeAnalysis.profileWeighting}</dd></div>
+              <div><dt>Cached package</dt><dd>{cacheInfo === null ? "No" : "Yes"}</dd></div>
+            </dl>
+            <div className="overview-card-actions">
+              <button className="text-button" type="button" onClick={() => onNavigate("explorer")}>Inspect analysis</button>
+              <button className="text-button" type="button" onClick={() => onNavigate("workshop")}>Open Decision Workshop</button>
             </div>
-            <span className="feature-link">Open reference</span>
-          </button>
-        </div>
+          </article>
+
+          <article className="overview-radar-card">
+            <div className="card-heading-row">
+              <div>
+                <p className="eyebrow">Canonical profile</p>
+                <h2>Merged compliance profiles</h2>
+              </div>
+              <span className="tag tag-muted">{activeAnalysis.subjects.length} agents</span>
+            </div>
+            <ComplianceMultiRadar profiles={activeAnalysis.profiles} />
+            <p className="overview-chart-note">Point-estimate GOBPFR profiles from the selected exported analysis. Decision functions do not modify this chart.</p>
+          </article>
+        </section>
+      )}
+
+      <section className="overview-tools">
+        <button type="button" onClick={() => onNavigate("explorer")}>
+          <span>Inspect</span>
+          <strong>Data Explorer</strong>
+          <small>Profiles, requirements, availability, trajectory, files, and provenance.</small>
+        </button>
+        <button type="button" onClick={() => onNavigate("workshop")}>
+          <span>Decide</span>
+          <strong>Decision Workshop</strong>
+          <small>Apply persisted decision recipes without changing canonical ACMM evidence.</small>
+        </button>
+        <button type="button" onClick={() => onNavigate("reference")}>
+          <span>Lookup</span>
+          <strong>Reference</strong>
+          <small>Browse Core JSON Schemas, experiment package YAML, artifacts, fields, and concepts.</small>
+        </button>
       </section>
     </div>
   );

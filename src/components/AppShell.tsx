@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { navigationItems, type AppView } from "../app/navigation";
+import { useExportSession } from "../data/session/ExportSession";
 
 interface AppShellProps
 {
@@ -10,6 +11,8 @@ interface AppShellProps
 
 export function AppShell({ activeView, onNavigate, children }: AppShellProps)
 {
+  const { busy, busyLabel, dataset } = useExportSession();
+
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -35,11 +38,22 @@ export function AppShell({ activeView, onNavigate, children }: AppShellProps)
           ))}
         </nav>
 
-        <div className="local-badge" title="Selected experiment data stays local to this browser; one accepted export may be cached locally.">
-          <span className="status-dot" aria-hidden="true" />
-          Local only
+        <div
+          className={busy ? "local-badge local-badge-busy" : "local-badge"}
+          title="Selected experiment data stays local to this browser; one accepted export may be cached locally."
+        >
+          <span className={busy ? "status-dot status-dot-busy" : "status-dot"} aria-hidden="true" />
+          {busy ? busyLabel : dataset === null ? "Local only" : "Export loaded"}
         </div>
       </header>
+
+      {busy && (
+        <div className="global-loading" role="status" aria-live="polite">
+          <span className="global-loading-bar" aria-hidden="true" />
+          <span>{busyLabel}</span>
+          <small>Navigation remains available; this shared load continues once for the application.</small>
+        </div>
+      )}
 
       <main className="page-frame">{children}</main>
 

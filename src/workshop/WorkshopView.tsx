@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import type { AppView } from "../app/navigation";
-import { detectAdapters, normalizeWithAdapter } from "../data/adapters/registry";
-import { readCachedExport, updateCachedSelection } from "../data/cache/exportCache";
-import { inspectFiles } from "../data/ingest/inspect";
-import { complianceDimensions, type AcmmExportDataset, type AnalysisSnapshot, type AgentProfile } from "../data/model";
+import { complianceDimensions, type AnalysisSnapshot, type AgentProfile } from "../data/model";
+import { useExportSession } from "../data/session/ExportSession";
 import {
   evaluateDecisionExpression,
   isValidParameterId,
@@ -398,10 +396,15 @@ function cloneDefinition(definition: DecisionFunctionDefinition): DecisionFuncti
 
 export function WorkshopView({ onNavigate }: WorkshopViewProps)
 {
-  const [dataset, setDataset] = useState<AcmmExportDataset | null>(null);
-  const [analysisId, setAnalysisId] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const {
+    dataset,
+    selectedAnalysisId: analysisId,
+    busy: loading,
+    inspectionError,
+    normalizationError,
+    changeAnalysis,
+  } = useExportSession();
+  const loadError = inspectionError ?? normalizationError;
   const [functions, setFunctions] = useState<DecisionFunctionDefinition[]>(() => listDecisionFunctions());
   const [selectedFunctionId, setSelectedFunctionId] = useState("preset-equal-mean");
   const [draft, setDraft] = useState<DecisionFunctionDefinition | null>(null);
@@ -411,60 +414,6 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
   const [comparisonLeftId, setComparisonLeftId] = useState("preset-equal-mean");
   const [comparisonRightId, setComparisonRightId] = useState("");
   const recipeImportRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() =>
-  {
-    let cancelled = false;
-    setLoading(true);
-    void readCachedExport()
-      .then(async (cached) =>
-      {
-        if (cached === null)
-        {
-          return;
-        }
-
-        const inspection = await inspectFiles([cached.file]);
-        const exact = detectAdapters(inspection).find((match) => match.confidence === "exact");
-        if (exact === undefined)
-        {
-          throw new Error("The cached file no longer matches a supported ACMM export adapter.");
-        }
-        const normalized = await normalizeWithAdapter(inspection, exact.adapterId);
-        if (cancelled)
-        {
-          return;
-        }
-
-        setDataset(normalized);
-        const preferred = cached.selectedAnalysisId === null
-          ? undefined
-          : normalized.analyses.find((analysis) => analysis.id === cached.selectedAnalysisId);
-        const initial = preferred
-          ?? normalized.analyses.find((analysis) => analysis.id === normalized.defaultAnalysisId)
-          ?? normalized.analyses[0];
-        setAnalysisId(initial?.id ?? "");
-      })
-      .catch((error) =>
-      {
-        if (!cancelled)
-        {
-          setLoadError(error instanceof Error ? error.message : "Unable to load the cached export.");
-        }
-      })
-      .finally(() =>
-      {
-        if (!cancelled)
-        {
-          setLoading(false);
-        }
-      });
-
-    return () =>
-    {
-      cancelled = true;
-    };
-  }, []);
 
   const selectedFunction = useMemo(
     () => functions.find((item) => item.id === selectedFunctionId) ?? functions[0] ?? null,
@@ -622,14 +571,7 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
 
   const selectAnalysis = (nextId: string) =>
   {
-    setAnalysisId(nextId);
-    void readCachedExport().then((cached) =>
-    {
-      if (cached !== null)
-      {
-        void updateCachedSelection(nextId, cached.selectedSubjectId);
-      }
-    }).catch(() => undefined);
+    changeAnalysis(nextId);
   };
 
   const selectFunction = (nextId: string) =>
@@ -911,7 +853,7 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
         </p>
       </section>
 
-      {loading && <div className="working-box">Loading the cached ACMM export...</div>}
+      {loading && <div className="working-box">Loading the shared ACMM export session...</div>}
 
       {!loading && loadError !== null && (
         <div className="error-box">
@@ -924,8 +866,17 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
         <section className="empty-workshop-card">
           <p className="eyebrow">No active export</p>
           <h2>Open an ACMM export before using the workshop.</h2>
-          <p>The workshop reads the same single-slot local export cache used by Data Explorer.</p>
+          <p>The workshop uses the same shared normalized export session as Overview and Data Explorer.</p>
           <button className="button button-primary" type="button" onClick={() => onNavigate("explorer")}>Open Data Explorer</button>
+        </section>
+      )}
+
+      {!loading && dataset !== null && activeAnalysis === null && loadError === null && (
+        <section className="empty-workshop-card">
+          <p className="eyebrow">Analysis selection required</p>
+          <h2>Select an analysis snapshot before using the workshop.</h2>
+          <p>The loaded export contains multiple analyzed snapshots and no active snapshot is selected yet.</p>
+          <button className="button button-primary" type="button" onClick={() => onNavigate("explorer")}>Select in Data Explorer</button>
         </section>
       )}
 

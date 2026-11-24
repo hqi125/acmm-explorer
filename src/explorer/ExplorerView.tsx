@@ -8,22 +8,14 @@ import {
   type DragEvent,
   type WheelEvent,
 } from "react";
-import { detectAdapters, normalizeWithAdapter } from "../data/adapters/registry";
-import {
-  clearCachedExport,
-  readCachedExport,
-  updateCachedSelection,
-  writeCachedExport,
-  type CachedExportInfo,
-} from "../data/cache/exportCache";
+import { detectAdapters } from "../data/adapters/registry";
+import { useExportSession } from "../data/session/ExportSession";
 import { type AcmmExportDataset, type AnalysisSnapshot, type AgentProfile, type ComplianceDimension } from "../data/model";
 import { createPreview } from "../data/ingest/preview";
-import { inspectFiles } from "../data/ingest/inspect";
 import type {
   DataFileKind,
   DataPreview,
   InspectionEntry,
-  InspectionResult,
 } from "../data/types";
 import { ComplianceRadar } from "../visualization/ComplianceRadar";
 import { ComplianceComparison } from "../visualization/ComplianceComparison";
@@ -561,28 +553,35 @@ function NormalizedProfile({
   );
 }
 
-interface InspectionOptions
-{
-  cacheAccepted?: boolean;
-  preferredAnalysisId?: string | null;
-  preferredSubjectId?: string | null;
-}
-
 export function ExplorerView()
 {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [inspection, setInspection] = useState<InspectionResult | null>(null);
-  const [inspectionError, setInspectionError] = useState<string | null>(null);
-  const [inspecting, setInspecting] = useState(false);
-  const [normalizing, setNormalizing] = useState(false);
-  const [normalizationError, setNormalizationError] = useState<string | null>(null);
-  const [dataset, setDataset] = useState<AcmmExportDataset | null>(null);
-  const [selectedAnalysisId, setSelectedAnalysisId] = useState("");
-  const [pendingAnalysisId, setPendingAnalysisId] = useState("");
-  const [analysisChooserOpen, setAnalysisChooserOpen] = useState(false);
-  const [selectedSubjectId, setSelectedSubjectId] = useState("");
+  const previewRequestId = useRef(0);
+  const {
+    selectedFiles,
+    inspection,
+    inspectionError,
+    normalizationError,
+    dataset,
+    selectedAnalysisId,
+    pendingAnalysisId,
+    analysisChooserOpen,
+    selectedSubjectId,
+    cacheInfo,
+    cacheError,
+    phase,
+    loadExport,
+    clearSession,
+    clearCache,
+    setPendingAnalysisId,
+    confirmAnalysisSelection,
+    changeAnalysis,
+    changeSubject,
+  } = useExportSession();
+  const inspecting = phase === "inspecting" || phase === "restoring";
+  const restoringCache = phase === "restoring";
+  const normalizing = phase === "normalizing";
   const [dragActive, setDragActive] = useState(false);
   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
   const [preview, setPreview] = useState<DataPreview | null>(null);
@@ -590,10 +589,6 @@ export function ExplorerView()
   const [query, setQuery] = useState("");
   const [kindFilter, setKindFilter] = useState<DataFileKind | "all">("all");
   const [inventoryPage, setInventoryPage] = useState(1);
-  const [cacheInfo, setCacheInfo] = useState<CachedExportInfo | null>(null);
-  const [cacheError, setCacheError] = useState<string | null>(null);
-  const [restoringCache, setRestoringCache] = useState(false);
-  const cacheRestoreStarted = useRef(false);
 
   const adapters = useMemo(
     () => inspection === null ? [] : detectAdapters(inspection),
@@ -623,23 +618,19 @@ export function ExplorerView()
     }
 
     const normalizedQuery = query.trim().toLowerCase();
-
     return inspection.entries.filter((entry) =>
     {
       if (kindFilter !== "all" && entry.kind !== kindFilter)
       {
         return false;
       }
-
       if (normalizedQuery.length > 0 && !basename(entry.path).toLowerCase().includes(normalizedQuery))
       {
         return false;
       }
-
       return true;
     });
   }, [inspection, kindFilter, query]);
-
 
   const inventoryPageCount = Math.max(1, Math.ceil(filteredEntries.length / inventoryPageSize));
   const pagedEntries = useMemo(() =>
@@ -648,7 +639,6 @@ export function ExplorerView()
     return filteredEntries.slice(start, start + inventoryPageSize);
   }, [filteredEntries, inventoryPage]);
 
-
   useEffect(() =>
   {
     if (inventoryPage > inventoryPageCount)
@@ -656,6 +646,7 @@ export function ExplorerView()
       setInventoryPage(inventoryPageCount);
     }
   }, [inventoryPage, inventoryPageCount]);
+
   const kindCounts = useMemo(() =>
   {
     const counts = new Map<DataFileKind, number>();
@@ -668,17 +659,11 @@ export function ExplorerView()
 
   const clearSelection = () =>
   {
-    setSelectedFiles([]);
-    setInspection(null);
-    setInspectionError(null);
-    setNormalizationError(null);
-    setDataset(null);
-    setSelectedAnalysisId("");
-    setPendingAnalysisId("");
-    setAnalysisChooserOpen(false);
-    setSelectedSubjectId("");
+    previewRequestId.current += 1;
+    clearSession();
     setSelectedEntryId(null);
     setPreview(null);
+    setPreviewLoading(false);
     setQuery("");
     setKindFilter("all");
     setInventoryPage(1);
@@ -688,137 +673,36 @@ export function ExplorerView()
     }
   };
 
-  const persistSelection = (analysisId: string | null, subjectId: string | null) =>
+  const selectEntry = async (entry: InspectionEntry) =>
   {
-    void updateCachedSelection(analysisId, subjectId)
-      .then((info) =>
-      {
-        if (info !== null)
-        {
-          setCacheInfo(info);
-        }
-      })
-      .catch(() => undefined);
-  };
-
-  const normalizeInspection = async (
-    result: InspectionResult,
-    preferredAnalysisId: string | null = null,
-    preferredSubjectId: string | null = null,
-  ) =>
-  {
-    const matches = detectAdapters(result);
-    const exact = matches.find((match) => match.confidence === "exact");
-    if (exact === undefined)
+    const requestId = ++previewRequestId.current;
+    setSelectedEntryId(entry.id);
+    setPreview(null);
+    setPreviewLoading(true);
+    const nextPreview = await createPreview(entry);
+    if (previewRequestId.current === requestId)
     {
-      return;
-    }
-
-    setNormalizing(true);
-    setNormalizationError(null);
-    try
-    {
-      const nextDataset = await normalizeWithAdapter(result, exact.adapterId);
-      setDataset(nextDataset);
-
-      const preferredAnalysis = preferredAnalysisId === null
-        ? undefined
-        : nextDataset.analyses.find((analysis) => analysis.id === preferredAnalysisId);
-      const defaultAnalysis = preferredAnalysis
-        ?? nextDataset.analyses.find((analysis) => analysis.id === nextDataset.defaultAnalysisId)
-        ?? nextDataset.analyses[0];
-
-      if (nextDataset.analyses.length > 1 && preferredAnalysis === undefined)
-      {
-        setSelectedAnalysisId("");
-        setSelectedSubjectId("");
-        setPendingAnalysisId(defaultAnalysis?.id ?? "");
-        setAnalysisChooserOpen(true);
-      }
-      else
-      {
-        const nextAnalysisId = defaultAnalysis?.id ?? "";
-        const nextSubjectId = preferredSubjectId !== null && defaultAnalysis?.subjects.includes(preferredSubjectId)
-          ? preferredSubjectId
-          : defaultAnalysis?.subjects[0] ?? "";
-        setSelectedAnalysisId(nextAnalysisId);
-        setSelectedSubjectId(nextSubjectId);
-        setPendingAnalysisId(nextAnalysisId);
-        setAnalysisChooserOpen(false);
-        persistSelection(nextAnalysisId || null, nextSubjectId || null);
-      }
-    }
-    catch (error)
-    {
-      setNormalizationError(error instanceof Error ? error.message : "Unknown normalization error.");
-    }
-    finally
-    {
-      setNormalizing(false);
+      setPreview(nextPreview);
+      setPreviewLoading(false);
     }
   };
 
-  const inspectSelection = async (files: File[], options: InspectionOptions = {}) =>
+  useEffect(() =>
   {
-    setSelectedFiles(files);
-    setInspecting(true);
-    setInspection(null);
-    setInspectionError(null);
-    setNormalizationError(null);
-    setDataset(null);
-    setSelectedAnalysisId("");
-    setPendingAnalysisId("");
-    setAnalysisChooserOpen(false);
-    setSelectedSubjectId("");
+    previewRequestId.current += 1;
     setSelectedEntryId(null);
     setPreview(null);
+    setPreviewLoading(false);
+    setQuery("");
+    setKindFilter("all");
+    setInventoryPage(1);
 
-    try
+    const firstPreviewable = inspection?.entries.find((entry) => entry.previewable);
+    if (firstPreviewable !== undefined)
     {
-      const result = await inspectFiles(files);
-      setInspection(result);
-
-      const exact = detectAdapters(result).some((match) => match.confidence === "exact");
-      if (options.cacheAccepted === true && exact && files.length === 1)
-      {
-        try
-        {
-          const info = await writeCachedExport(files[0]);
-          setCacheInfo(info);
-          setCacheError(null);
-        }
-        catch (error)
-        {
-          setCacheError(error instanceof Error ? error.message : "Unable to cache this export locally.");
-        }
-      }
-
-      await normalizeInspection(
-        result,
-        options.preferredAnalysisId ?? null,
-        options.preferredSubjectId ?? null,
-      );
-
-      const firstPreviewable = result.entries.find((entry) => entry.previewable);
-      if (firstPreviewable !== undefined)
-      {
-        setSelectedEntryId(firstPreviewable.id);
-        setPreviewLoading(true);
-        const nextPreview = await createPreview(firstPreviewable);
-        setPreview(nextPreview);
-        setPreviewLoading(false);
-      }
+      void selectEntry(firstPreviewable);
     }
-    catch (error)
-    {
-      const message = error instanceof Error ? error.message : "Unknown ingestion error.";
-      setInspectionError(message);
-    }
-    finally
-    {
-      setInspecting(false);
-    }
-  };
+  }, [inspection]);
 
   const acceptFiles = (fileList: FileList | null) =>
   {
@@ -826,32 +710,7 @@ export function ExplorerView()
     {
       return;
     }
-
-    void inspectSelection(Array.from(fileList), { cacheAccepted: true });
-  };
-
-  const clearCache = async () =>
-  {
-    try
-    {
-      await clearCachedExport();
-      setCacheInfo(null);
-      setCacheError(null);
-    }
-    catch (error)
-    {
-      setCacheError(error instanceof Error ? error.message : "Unable to clear the local export cache.");
-    }
-  };
-
-  const selectEntry = async (entry: InspectionEntry) =>
-  {
-    setSelectedEntryId(entry.id);
-    setPreview(null);
-    setPreviewLoading(true);
-    const nextPreview = await createPreview(entry);
-    setPreview(nextPreview);
-    setPreviewLoading(false);
+    void loadExport(Array.from(fileList), { cacheAccepted: true });
   };
 
   const openSourcePath = (path: string) =>
@@ -871,49 +730,6 @@ export function ExplorerView()
     window.setTimeout(() => document.querySelector(".preview-card")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   };
 
-  const confirmAnalysisSelection = () =>
-  {
-    if (dataset === null)
-    {
-      return;
-    }
-
-    const nextAnalysis = dataset.analyses.find((analysis) => analysis.id === pendingAnalysisId);
-    if (nextAnalysis === undefined)
-    {
-      return;
-    }
-
-    const nextSubjectId = nextAnalysis.subjects[0] ?? "";
-    setSelectedAnalysisId(nextAnalysis.id);
-    setSelectedSubjectId(nextSubjectId);
-    setAnalysisChooserOpen(false);
-    persistSelection(nextAnalysis.id, nextSubjectId || null);
-  };
-
-  const changeAnalysis = (analysisId: string) =>
-  {
-    setSelectedAnalysisId(analysisId);
-    setPendingAnalysisId(analysisId);
-    const nextAnalysis = dataset?.analyses.find((analysis) => analysis.id === analysisId);
-    if (nextAnalysis === undefined)
-    {
-      return;
-    }
-
-    const nextSubjectId = nextAnalysis.subjects.includes(selectedSubjectId)
-      ? selectedSubjectId
-      : nextAnalysis.subjects[0] ?? "";
-    setSelectedSubjectId(nextSubjectId);
-    persistSelection(analysisId, nextSubjectId || null);
-  };
-
-  const changeSubject = (subjectId: string) =>
-  {
-    setSelectedSubjectId(subjectId);
-    persistSelection(selectedAnalysisId || null, subjectId);
-  };
-
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) =>
   {
     acceptFiles(event.target.files);
@@ -925,40 +741,6 @@ export function ExplorerView()
     setDragActive(false);
     acceptFiles(event.dataTransfer.files);
   };
-
-  useEffect(() =>
-  {
-    if (cacheRestoreStarted.current)
-    {
-      return;
-    }
-
-    cacheRestoreStarted.current = true;
-    setRestoringCache(true);
-    void readCachedExport()
-      .then(async (cached) =>
-      {
-        if (cached === null)
-        {
-          return;
-        }
-
-        setCacheInfo({
-          name: cached.name,
-          size: cached.size,
-          cachedAt: cached.cachedAt,
-          selectedAnalysisId: cached.selectedAnalysisId,
-          selectedSubjectId: cached.selectedSubjectId,
-        });
-        await inspectSelection([cached.file], {
-          cacheAccepted: false,
-          preferredAnalysisId: cached.selectedAnalysisId,
-          preferredSubjectId: cached.selectedSubjectId,
-        });
-      })
-      .catch((error) => setCacheError(error instanceof Error ? error.message : "Unable to restore the local export cache."))
-      .finally(() => setRestoringCache(false));
-  }, []);
 
   const hasInspection = inspection !== null;
   const exactAdapterMatched = adapters.some((adapter) => adapter.confidence === "exact");
