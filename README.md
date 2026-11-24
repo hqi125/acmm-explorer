@@ -6,7 +6,7 @@ ACMM Explorer is intentionally separate from the frozen ACMM research and experi
 
 ## Current status
 
-The project now includes ACMM-aware export viewing plus the first Decision Workshop foundation. The current build includes:
+The project now includes ACMM-aware export viewing plus a reusable Decision Workshop function store. The current build includes:
 
 - React + TypeScript + Vite frontend foundation.
 - Docker-contained development environment.
@@ -21,7 +21,9 @@ The project now includes ACMM-aware export viewing plus the first Decision Works
 - Availability summaries and trajectory summaries when those analysis tables are present.
 - Source links from profile rows back to the exact exported analysis table.
 - Paginated file inventory with filename search and file-type filtering.
-- Decision Workshop with a persisted local function store, built-in presets, a bounded expression evaluator, merged canonical radar, and conditional cross-agent ranking.
+- Decision Workshop with a persisted local function store, categorized presets, a bounded expression evaluator, merged canonical radar, conditional cross-agent ranking, and saved-parameter sensitivity sweeps.
+- Recipe-defined parameter controls with optional min/max/step metadata and procedural number/slider rendering.
+- Versioned local decision-recipe JSON import/export (`acmm-explorer-decision-recipe/0.1`).
 - Failure-aware ingestion stages that mark the failed stage and block later stages visually.
 - Reference-search shell for future generated CLI/schema documentation.
 - No server-side storage, upload service, or external data processing.
@@ -110,3 +112,25 @@ New substantial frontend libraries should be introduced only when a concrete fea
 ## License
 
 Apache License 2.0. See `LICENSE` and `NOTICE`.
+
+## Decision Workshop
+
+Parameter editor note: control metadata (control type, min, max, step) is kept in a per-parameter disclosure so routine symbol/label/value editing stays compact. The control metadata remains part of the persisted recipe and still drives the procedural editor.
+
+The Decision Workshop keeps canonical ACMM evidence separate from user-defined preference logic. On desktop its top summary row uses three read-only views: canonical merged radar on the left, the selected saved decision function in the center, and the conditional ranking/result on the right. Full editing and analytical tools are stacked below that summary row.
+
+- The merged compliance radar always renders unmodified exported point estimates.
+- The top function summary always shows the last saved recipe. Draft edits live only in the full editor below it.
+- A stored decision function is evaluated only when it is in a saved/locked state.
+- Entering edit mode invalidates the visible ranking until the function is saved again.
+- Presets are read-only and can be duplicated into custom functions.
+- Parameter rows are generated from each recipe's declared parameter definitions; they are not hard-coded to a specific preset.
+- Parameters may declare `min`, `max`, `step`, and `control` metadata. Slider controls are rendered only from that stored metadata; unknown expression identifiers still fail validation.
+- Built-in presets are grouped by purpose (`Basic`, `Weighted`, `Constrained`) in the function selector.
+- The expression parser resolves declared parameter symbols. Unknown identifiers fail validation rather than silently creating new parameters.
+- Parameter and eligibility-rule lists use bounded inline scroll regions so large recipes do not make the page grow without limit.
+- Eligibility rules are evaluated separately from the score and cannot be compensated by a high score on another dimension.
+- The score comparison chart renders raw function output for eligible agents only; it does not normalize scores into percentages.
+- Saved functions can be exported as versioned recipe JSON. Import validates the recipe and stores it as a new custom function rather than overwriting an existing entry.
+- Bounded parameters (explicit `min` and `max`) can be inspected with a one-parameter sensitivity sweep. The sweep samples the saved function at 41 points while all other parameters remain fixed and does not modify the recipe.
+- The top summary uses three columns on wide screens, two columns at intermediate widths, and one column on narrow screens. The full editor and sensitivity tools remain vertically stacked beneath it.

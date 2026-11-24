@@ -1,4 +1,5 @@
 export type DecisionVariables = Record<"goal" | "obligation" | "boundary" | "procedure" | "fidelity" | "recovery", number>;
+export type DecisionParameters = Record<string, number>;
 
 type TokenKind = "number" | "identifier" | "operator" | "left-paren" | "right-paren" | "comma" | "eof";
 
@@ -10,10 +11,20 @@ interface Token
 }
 
 const variableNames = new Set(["goal", "obligation", "boundary", "procedure", "fidelity", "recovery"]);
+const functionNames = new Set(["abs", "sqrt", "exp", "log", "log10", "sin", "cos", "tan", "min", "max", "pow", "clamp"]);
 const constants: Record<string, number> = {
   pi: Math.PI,
   e: Math.E,
 };
+
+export function isValidParameterId(value: string): boolean
+{
+  const normalized = value.toLowerCase();
+  return /^[a-z_][a-z0-9_]*$/.test(normalized)
+    && !variableNames.has(normalized)
+    && !functionNames.has(normalized)
+    && !Object.prototype.hasOwnProperty.call(constants, normalized);
+}
 
 function tokenize(expression: string): Token[]
 {
@@ -194,6 +205,7 @@ class Parser
   public constructor(
     private readonly tokens: Token[],
     private readonly variables: DecisionVariables,
+    private readonly parameters: DecisionParameters,
   )
   {
   }
@@ -314,11 +326,15 @@ class Parser
       {
         return this.variables[name as keyof DecisionVariables];
       }
+      if (Object.prototype.hasOwnProperty.call(this.parameters, name))
+      {
+        return this.parameters[name];
+      }
       if (Object.prototype.hasOwnProperty.call(constants, name))
       {
         return constants[name];
       }
-      throw new Error(`Unknown variable '${name}'.`);
+      throw new Error(`Unknown variable or parameter '${name}'.`);
     }
 
     if (token.kind === "left-paren")
@@ -337,16 +353,23 @@ class Parser
   }
 }
 
-export function evaluateDecisionExpression(expression: string, variables: DecisionVariables): number
+export function evaluateDecisionExpression(
+  expression: string,
+  variables: DecisionVariables,
+  parameters: DecisionParameters = {},
+): number
 {
   if (expression.trim().length === 0)
   {
     throw new Error("Expression is empty.");
   }
-  return new Parser(tokenize(expression), variables).parse();
+  return new Parser(tokenize(expression), variables, parameters).parse();
 }
 
-export function validateDecisionExpression(expression: string): string | null
+export function validateDecisionExpression(
+  expression: string,
+  parameters: DecisionParameters = {},
+): string | null
 {
   try
   {
@@ -357,7 +380,7 @@ export function validateDecisionExpression(expression: string): string | null
       procedure: 0.5,
       fidelity: 0.5,
       recovery: 0.5,
-    });
+    }, parameters);
     return null;
   }
   catch (error)
