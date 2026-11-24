@@ -21,9 +21,9 @@ The project now includes ACMM-aware export viewing plus a reusable Decision Work
 - Availability summaries and trajectory summaries when those analysis tables are present.
 - Source links from profile rows back to the exact exported analysis table.
 - Paginated file inventory with filename search and file-type filtering.
-- Decision Workshop with a persisted local function store, categorized presets, a bounded expression evaluator, merged canonical radar, conditional cross-agent ranking, and saved-parameter sensitivity sweeps.
-- Recipe-defined parameter controls with optional min/max/step metadata and procedural number/slider rendering.
-- Versioned local decision-recipe JSON import/export (`acmm-explorer-decision-recipe/0.1`).
+- Decision Workshop with a persisted local function store, categorized presets, a bounded expression evaluator, merged canonical radar, conditional cross-agent ranking, normalized parameter groups, and saved-parameter sensitivity sweeps.
+- Recipe-defined parameter controls with optional min/max/step metadata, procedural number/slider rendering, and optional parameter-group transforms such as sum-to-one normalization.
+- Versioned local decision-recipe JSON import/export (`acmm-explorer-decision-recipe/0.2`), with backward-compatible import of `0.1` recipes.
 - Failure-aware ingestion stages that mark the failed stage and block later stages visually.
 - Reference-search shell for future generated CLI/schema documentation.
 - No server-side storage, upload service, or external data processing.
@@ -109,6 +109,17 @@ New substantial frontend libraries should be introduced only when a concrete fea
 7. Interface copy should stay concise and functional. Richness belongs primarily in data views, tables, plots, filtering, and drill-down interactions rather than promotional or presentation-oriented text.
 8. Decision Workshop outputs are conditional user-defined decision results, not canonical ACMM good/bad scores. Canonical profile values remain unchanged by workshop functions.
 
+### Parameter groups and effective values
+
+A recipe can declare parameter groups separately from its parameters. Each parameter may optionally reference one group. The current policies are:
+
+- `none`: pass the saved raw parameter values to the expression unchanged.
+- `sum-to-one`: divide each member's raw value by the group's raw total before expression evaluation.
+
+Normalization never rewrites the saved raw values. The editor shows raw values as the editable controls and displays an effective value when a parameter belongs to a sum-to-one group. The saved-function summary likewise identifies normalized values and their raw source values. A sum-to-one group must contain at least one parameter and cannot have a zero raw total.
+
+The built-in `Weighted linear profile` preset uses a `weights` group with sum-to-one normalization and therefore evaluates a direct weighted sum over the six GOBPFR dimensions. Existing custom recipes created by older Explorer versions are migrated with no parameter groups, preserving their earlier behavior.
+
 ## License
 
 Apache License 2.0. See `LICENSE` and `NOTICE`.
@@ -132,5 +143,6 @@ The Decision Workshop keeps canonical ACMM evidence separate from user-defined p
 - Eligibility rules are evaluated separately from the score and cannot be compensated by a high score on another dimension.
 - The score comparison chart renders raw function output for eligible agents only; it does not normalize scores into percentages.
 - Saved functions can be exported as versioned recipe JSON. Import validates the recipe and stores it as a new custom function rather than overwriting an existing entry.
-- Bounded parameters (explicit `min` and `max`) can be inspected with a one-parameter sensitivity sweep. The sweep samples the saved function at 41 points while all other parameters remain fixed and does not modify the recipe.
+- Bounded parameters (explicit `min` and `max`) can be inspected with a one-parameter sensitivity sweep. The sweep samples the saved raw parameter at 41 points while all other raw parameters remain fixed, reapplies parameter-group normalization at each sample, and does not modify the recipe.
+- Sensitivity results detect approximate pairwise score crossings and report where the ordering changes as the selected parameter increases.
 - The top summary uses three columns on wide screens, two columns at intermediate widths, and one column on narrow screens. The full editor and sensitivity tools remain vertically stacked beneath it.

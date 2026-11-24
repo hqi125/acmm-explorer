@@ -18,6 +18,8 @@ import type {
   DecisionFunctionDefinition,
   DecisionParameterControl,
   DecisionParameterDefinition,
+  DecisionParameterGroupDefinition,
+  DecisionParameterGroupPolicy,
   EligibilityOperator,
 } from "../decision/model";
 import {
@@ -26,6 +28,8 @@ import {
   listDecisionFunctions,
   saveDecisionFunction,
 } from "../decision/store";
+import { effectiveDecisionParameters } from "../decision/parameters";
+import { detectDecisionSensitivityCrossings } from "../decision/sensitivity";
 import { decisionRecipeFileName, parseDecisionRecipe, serializeDecisionRecipe } from "../decision/transfer";
 import { ComplianceMultiRadar } from "../visualization/ComplianceMultiRadar";
 import { DecisionScoreChart } from "../visualization/DecisionScoreChart";
@@ -63,9 +67,13 @@ function profileVariables(profile: AgentProfile): DecisionVariables | null
   return result;
 }
 
-function parameterRecord(definition: DecisionFunctionDefinition): DecisionParameters
+function formatParameterValue(value: number): string
 {
-  return Object.fromEntries(definition.parameters.map((item) => [item.id.toLowerCase(), item.value]));
+  if (Math.abs(value) >= 1000 || (Math.abs(value) > 0 && Math.abs(value) < 0.0001))
+  {
+    return value.toExponential(4);
+  }
+  return Number(value.toFixed(6)).toString();
 }
 
 function rulePasses(rule: DecisionEligibilityRule, variables: DecisionVariables): boolean
@@ -91,7 +99,7 @@ function describeRule(rule: DecisionEligibilityRule): string
 
 function evaluateProfiles(analysis: AnalysisSnapshot, definition: DecisionFunctionDefinition): DecisionEvaluation[]
 {
-  const parameters = parameterRecord(definition);
+  const parameters = effectiveDecisionParameters(definition);
   return analysis.profiles.map((profile) =>
   {
     const variables = profileVariables(profile);
@@ -169,7 +177,6 @@ function evaluateSensitivity(
   }
 
   const sampleCount = 41;
-  const baseParameters = parameterRecord(definition);
   const parameterId = parameter.id.toLowerCase();
 
   return analysis.profiles.flatMap((profile): DecisionSensitivitySeries[] =>
@@ -191,7 +198,7 @@ function evaluateSensitivity(
         const value = evaluateDecisionExpression(
           definition.expression,
           variables,
-          { ...baseParameters, [parameterId]: parameterValue },
+          effectiveDecisionParameters(definition, { [parameterId]: parameterValue }),
         );
         if (!Number.isFinite(value))
         {
@@ -216,6 +223,25 @@ function validateRecipe(definition: DecisionFunctionDefinition): string | null
   if (definition.name.trim().length === 0)
   {
     return "Function name is required.";
+  }
+
+  const groupIds = new Set<string>();
+  for (const group of definition.parameterGroups)
+  {
+    const id = group.id.toLowerCase();
+    if (!/^[a-z_][a-z0-9_]*$/i.test(id))
+    {
+      return `Parameter group '${group.id}' must use a programming-style identifier.`;
+    }
+    if (groupIds.has(id))
+    {
+      return `Parameter group '${group.id}' is defined more than once.`;
+    }
+    if (group.label.trim().length === 0)
+    {
+      return `Parameter group '${group.id}' requires a label.`;
+    }
+    groupIds.add(id);
   }
 
   const ids = new Set<string>();
@@ -262,7 +288,29 @@ function validateRecipe(definition: DecisionFunctionDefinition): string | null
     {
       return `Slider parameter '${parameter.id}' requires both minimum and maximum values.`;
     }
+    if (parameter.groupId !== null && !groupIds.has(parameter.groupId.toLowerCase()))
+    {
+      return `Parameter '${parameter.id}' references unknown group '${parameter.groupId}'.`;
+    }
     ids.add(id);
+  }
+
+  for (const group of definition.parameterGroups)
+  {
+    if (group.policy !== "sum-to-one")
+    {
+      continue;
+    }
+    const members = definition.parameters.filter((parameter) => parameter.groupId?.toLowerCase() === group.id.toLowerCase());
+    if (members.length === 0)
+    {
+      return `Sum-to-one group '${group.label}' must contain at least one parameter.`;
+    }
+    const total = members.reduce((sum, parameter) => sum + parameter.value, 0);
+    if (Math.abs(total) < 1e-12)
+    {
+      return `Sum-to-one group '${group.label}' cannot have a raw total of zero.`;
+    }
   }
 
   for (const rule of definition.eligibilityRules)
@@ -273,13 +321,21 @@ function validateRecipe(definition: DecisionFunctionDefinition): string | null
     }
   }
 
-  return validateDecisionExpression(definition.expression, parameterRecord(definition));
+  try
+  {
+    return validateDecisionExpression(definition.expression, effectiveDecisionParameters(definition));
+  }
+  catch (error)
+  {
+    return error instanceof Error ? error.message : "Parameter normalization failed.";
+  }
 }
 
 function cloneDefinition(definition: DecisionFunctionDefinition): DecisionFunctionDefinition
 {
   return {
     ...definition,
+    parameterGroups: definition.parameterGroups.map((item) => ({ ...item })),
     parameters: definition.parameters.map((item) => ({ ...item })),
     eligibilityRules: definition.eligibilityRules.map((item) => ({ ...item })),
   };
@@ -401,6 +457,48 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
       : evaluateSensitivity(activeAnalysis, selectedFunction, sensitivityParameter),
     [activeAnalysis, isEditing, selectedFunction, sensitivityParameter],
   );
+  const sensitivityCrossings = useMemo(
+    () => isEditing ? [] : detectDecisionSensitivityCrossings(sensitivitySeries),
+    [isEditing, sensitivitySeries],
+  );
+  const selectedEffectiveParameters = useMemo(() =>
+  {
+    if (selectedFunction === null)
+    {
+      return {} as DecisionParameters;
+    }
+    try
+    {
+      return effectiveDecisionParameters(selectedFunction);
+    }
+    catch
+    {
+      return {} as DecisionParameters;
+    }
+  }, [selectedFunction]);
+  const draftEffectiveParameters = useMemo(() =>
+  {
+    if (draft === null)
+    {
+      return {} as DecisionParameters;
+    }
+    try
+    {
+      return effectiveDecisionParameters(draft);
+    }
+    catch
+    {
+      return {} as DecisionParameters;
+    }
+  }, [draft]);
+  const sensitivityEffectiveValue = useMemo(() =>
+  {
+    if (selectedFunction === null || sensitivityParameter === null)
+    {
+      return null;
+    }
+    return selectedEffectiveParameters[sensitivityParameter.id.toLowerCase()] ?? null;
+  }, [selectedEffectiveParameters, selectedFunction, sensitivityParameter]);
 
   const selectAnalysis = (nextId: string) =>
   {
@@ -507,6 +605,60 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
     setDraft({ ...draft, parameters });
   };
 
+  const updateParameterGroup = (index: number, patch: Partial<DecisionParameterGroupDefinition>) =>
+  {
+    if (draft === null)
+    {
+      return;
+    }
+    const previous = draft.parameterGroups[index];
+    const parameterGroups = draft.parameterGroups.map((item, itemIndex) => itemIndex === index ? { ...item, ...patch } : item);
+    let parameters = draft.parameters;
+    if (patch.id !== undefined && previous !== undefined && patch.id !== previous.id)
+    {
+      parameters = draft.parameters.map((parameter) => parameter.groupId === previous.id ? { ...parameter, groupId: patch.id ?? null } : parameter);
+    }
+    setDraft({ ...draft, parameterGroups, parameters });
+  };
+
+  const addParameterGroup = () =>
+  {
+    if (draft === null)
+    {
+      return;
+    }
+    let number = draft.parameterGroups.length + 1;
+    let id = `group_${number}`;
+    const existing = new Set(draft.parameterGroups.map((item) => item.id.toLowerCase()));
+    while (existing.has(id))
+    {
+      number += 1;
+      id = `group_${number}`;
+    }
+    setDraft({
+      ...draft,
+      parameterGroups: [...draft.parameterGroups, { id, label: `Parameter group ${number}`, policy: "none" }],
+    });
+  };
+
+  const removeParameterGroup = (index: number) =>
+  {
+    if (draft === null)
+    {
+      return;
+    }
+    const removed = draft.parameterGroups[index];
+    if (removed === undefined)
+    {
+      return;
+    }
+    setDraft({
+      ...draft,
+      parameterGroups: draft.parameterGroups.filter((_, itemIndex) => itemIndex !== index),
+      parameters: draft.parameters.map((parameter) => parameter.groupId === removed.id ? { ...parameter, groupId: null } : parameter),
+    });
+  };
+
   const addParameter = () =>
   {
     if (draft === null)
@@ -531,6 +683,7 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
         max: null,
         step: null,
         control: "number",
+        groupId: null,
       }],
     });
   };
@@ -736,8 +889,29 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
                   {selectedFunction.parameters.length === 0
                     ? <strong>None</strong>
                     : <div className="function-summary-values">
-                        {selectedFunction.parameters.map((parameter) => (
-                          <code key={parameter.id}>{parameter.id}={parameter.value}</code>
+                        {selectedFunction.parameters.map((parameter) =>
+                        {
+                          const effective = selectedEffectiveParameters[parameter.id.toLowerCase()] ?? parameter.value;
+                          const normalized = parameter.groupId !== null
+                            && selectedFunction.parameterGroups.some((group) => group.id.toLowerCase() === parameter.groupId?.toLowerCase() && group.policy === "sum-to-one");
+                          return (
+                            <code key={parameter.id}>
+                              {parameter.id}={formatParameterValue(effective)}{normalized ? ` (raw ${formatParameterValue(parameter.value)})` : ""}
+                            </code>
+                          );
+                        })}
+                      </div>}
+                </div>
+                <div>
+                  <span>Parameter groups</span>
+                  {selectedFunction.parameterGroups.length === 0
+                    ? <strong>None</strong>
+                    : <div className="function-summary-group-list">
+                        {selectedFunction.parameterGroups.map((group) => (
+                          <div className="function-summary-group-row" key={group.id}>
+                            <span className="function-summary-group-label">{group.label}</span>
+                            <span className="function-summary-group-policy">{group.policy === "sum-to-one" ? "Sum to 1" : "No transform"}</span>
+                          </div>
                         ))}
                       </div>}
                 </div>
@@ -894,6 +1068,36 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
                   <div className="recipe-subsection editor-first-subsection">
                     <div className="recipe-subsection-heading">
                       <div>
+                        <strong>Parameter groups <span className="recipe-count">{draft.parameterGroups.length}</span></strong>
+                        <span>Optional policies transform raw parameter values before expression evaluation.</span>
+                      </div>
+                      {isEditing && <button className="text-button" type="button" onClick={addParameterGroup}>Add group</button>}
+                    </div>
+                    {draft.parameterGroups.length === 0 ? (
+                      <span className="recipe-empty">No parameter groups. Parameter values are passed to the expression unchanged.</span>
+                    ) : (
+                      <div className="parameter-group-list">
+                        <div className="parameter-group-list-header" aria-hidden="true">
+                          <span>Identifier</span><span>Label</span><span>Policy</span><span />
+                        </div>
+                        {draft.parameterGroups.map((group, index) => (
+                          <div className="parameter-group-row" key={`${group.id}-${index}`}>
+                            <input aria-label="Parameter group identifier" value={group.id} disabled={!isEditing} onChange={(event: ChangeEvent<HTMLInputElement>) => updateParameterGroup(index, { id: event.target.value.toLowerCase() })} />
+                            <input aria-label="Parameter group label" value={group.label} disabled={!isEditing} onChange={(event: ChangeEvent<HTMLInputElement>) => updateParameterGroup(index, { label: event.target.value })} />
+                            <select aria-label="Parameter group policy" value={group.policy} disabled={!isEditing} onChange={(event: ChangeEvent<HTMLSelectElement>) => updateParameterGroup(index, { policy: event.target.value as DecisionParameterGroupPolicy })}>
+                              <option value="none">No transform</option>
+                              <option value="sum-to-one">Normalize: sum to 1</option>
+                            </select>
+                            {isEditing && <button className="row-remove-button" type="button" onClick={() => removeParameterGroup(index)}>Remove</button>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="recipe-subsection">
+                    <div className="recipe-subsection-heading">
+                      <div>
                         <strong>Parameters <span className="recipe-count">{draft.parameters.length}</span></strong>
                         <span>Named numeric values available to the expression.</span>
                       </div>
@@ -916,6 +1120,9 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
                                   <input className="parameter-slider" aria-label={`${parameter.label} slider`} type="range" min={parameter.min} max={parameter.max} step={parameter.step ?? "any"} value={parameter.value} disabled={!isEditing} onChange={(event: ChangeEvent<HTMLInputElement>) => updateParameter(index, { value: Number(event.target.value) })} />
                                 )}
                                 <input aria-label="Parameter value" type="number" min={parameter.min ?? undefined} max={parameter.max ?? undefined} step={parameter.step ?? "any"} value={parameter.value} disabled={!isEditing} onChange={(event: ChangeEvent<HTMLInputElement>) => updateParameter(index, { value: Number(event.target.value) })} />
+                                {parameter.groupId !== null && draft.parameterGroups.some((group) => group.id.toLowerCase() === parameter.groupId?.toLowerCase() && group.policy === "sum-to-one") && draftEffectiveParameters[parameter.id.toLowerCase()] !== undefined && (
+                                  <small className="parameter-effective-value">Effective {formatParameterValue(draftEffectiveParameters[parameter.id.toLowerCase()])}</small>
+                                )}
                               </div>
                               {isEditing && <button className="row-remove-button" type="button" onClick={() => removeParameter(index)}>Remove</button>}
                             </div>
@@ -923,9 +1130,10 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
                               <details className="parameter-options">
                                 <summary>
                                   <span>Control settings</span>
-                                  <small>{parameter.control === "slider" ? "Slider" : "Number"}{parameter.min !== null && parameter.max !== null ? ` | ${parameter.min} to ${parameter.max}` : ""}{parameter.step !== null ? ` | step ${parameter.step}` : ""}</small>
+                                  <small>{parameter.control === "slider" ? "Slider" : "Number"}{parameter.groupId !== null ? ` | ${draft.parameterGroups.find((group) => group.id.toLowerCase() === parameter.groupId?.toLowerCase())?.label ?? parameter.groupId}` : ""}{parameter.min !== null && parameter.max !== null ? ` | ${parameter.min} to ${parameter.max}` : ""}{parameter.step !== null ? ` | step ${parameter.step}` : ""}</small>
                                 </summary>
                                 <div className="parameter-metadata-row">
+                                  <label><span>Group</span><select aria-label="Parameter group" value={parameter.groupId ?? ""} onChange={(event: ChangeEvent<HTMLSelectElement>) => updateParameter(index, { groupId: event.target.value === "" ? null : event.target.value })}><option value="">None</option>{draft.parameterGroups.map((group) => <option key={group.id} value={group.id}>{group.label}</option>)}</select></label>
                                   <label><span>Control</span><select aria-label="Parameter control" value={parameter.control} onChange={(event: ChangeEvent<HTMLSelectElement>) => updateParameter(index, { control: event.target.value as DecisionParameterControl })}><option value="number">Number</option><option value="slider">Slider</option></select></label>
                                   <label><span>Min</span><input aria-label="Parameter minimum" type="number" step="any" value={parameter.min ?? ""} onChange={(event: ChangeEvent<HTMLInputElement>) => updateParameter(index, { min: event.target.value === "" ? null : Number(event.target.value) })} /></label>
                                   <label><span>Max</span><input aria-label="Parameter maximum" type="number" step="any" value={parameter.max ?? ""} onChange={(event: ChangeEvent<HTMLInputElement>) => updateParameter(index, { max: event.target.value === "" ? null : Number(event.target.value) })} /></label>
@@ -1020,13 +1228,34 @@ export function WorkshopView({ onNavigate }: WorkshopViewProps)
                           .map((parameter) => <option key={parameter.id} value={parameter.id}>{parameter.label} ({parameter.id})</option>)}
                       </select>
                     </label>
-                    <div className="sensitivity-stat"><span>Current</span><strong>{sensitivityParameter.value}</strong></div>
+                    <div className="sensitivity-stat"><span>Current raw</span><strong>{formatParameterValue(sensitivityParameter.value)}</strong></div>
+                    {sensitivityParameter.groupId !== null && selectedFunction.parameterGroups.some((group) => group.id.toLowerCase() === sensitivityParameter.groupId?.toLowerCase() && group.policy === "sum-to-one") && sensitivityEffectiveValue !== null && (
+                      <div className="sensitivity-stat"><span>Current effective</span><strong>{formatParameterValue(sensitivityEffectiveValue)}</strong></div>
+                    )}
                     <div className="sensitivity-stat"><span>Minimum</span><strong>{sensitivityParameter.min}</strong></div>
                     <div className="sensitivity-stat"><span>Maximum</span><strong>{sensitivityParameter.max}</strong></div>
                     <div className="sensitivity-stat"><span>Samples</span><strong>41</strong></div>
                   </div>
                   <DecisionSensitivityChart series={sensitivitySeries} parameterLabel={sensitivityParameter.label} currentValue={sensitivityParameter.value} />
-                  <p className="panel-note">This sweep is diagnostic only. It does not modify the saved parameter value or the canonical ACMM profiles.</p>
+                  <div className="sensitivity-crossings">
+                    <div className="sensitivity-crossings-heading">
+                      <strong>Approximate ranking changes</strong>
+                      <span>Pairwise score crossings detected from the sampled sweep.</span>
+                    </div>
+                    {sensitivityCrossings.length === 0 ? (
+                      <div className="sensitivity-crossing-empty">No pairwise ranking changes were detected across this parameter range.</div>
+                    ) : (
+                      <div className="sensitivity-crossing-list">
+                        {sensitivityCrossings.map((crossing, index) => (
+                          <div className="sensitivity-crossing-row" key={`${crossing.firstSubjectId}-${crossing.secondSubjectId}-${crossing.parameterValue}-${index}`}>
+                            <code>{sensitivityParameter.id} ~= {formatParameterValue(crossing.parameterValue)}</code>
+                            <span><strong>{crossing.afterLeader}</strong> overtakes {crossing.beforeLeader}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <p className="panel-note">This sweep varies the saved raw parameter value, reapplies any parameter-group normalization at every sample, and does not modify the saved recipe or canonical ACMM profiles.</p>
                 </>
               )}
             </section>

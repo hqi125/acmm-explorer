@@ -3,10 +3,13 @@ import type {
   DecisionFunctionDefinition,
   DecisionParameterControl,
   DecisionParameterDefinition,
+  DecisionParameterGroupDefinition,
+  DecisionParameterGroupPolicy,
 } from "./model";
 import { createCustomDecisionFunction } from "./store";
 
-export const decisionRecipeSchema = "acmm-explorer-decision-recipe/0.1";
+export const decisionRecipeSchema = "acmm-explorer-decision-recipe/0.2";
+const legacyDecisionRecipeSchema = "acmm-explorer-decision-recipe/0.1";
 
 interface DecisionRecipeFile
 {
@@ -17,6 +20,7 @@ interface DecisionRecipeFile
     description: string;
     category: string;
     expression: string;
+    parameterGroups?: DecisionParameterGroupDefinition[];
     parameters: DecisionParameterDefinition[];
     eligibilityRules: DecisionEligibilityRule[];
   };
@@ -25,6 +29,33 @@ interface DecisionRecipeFile
 function finiteOrNull(value: unknown): number | null
 {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function readParameterGroups(value: unknown): DecisionParameterGroupDefinition[]
+{
+  if (value === undefined)
+  {
+    return [];
+  }
+  if (!Array.isArray(value))
+  {
+    throw new Error("Recipe parameterGroups must be an array.");
+  }
+
+  return value.map((item, index) =>
+  {
+    if (typeof item !== "object" || item === null)
+    {
+      throw new Error(`Parameter group ${index + 1} is not an object.`);
+    }
+    const candidate = item as Partial<DecisionParameterGroupDefinition>;
+    if (typeof candidate.id !== "string" || typeof candidate.label !== "string")
+    {
+      throw new Error(`Parameter group ${index + 1} is missing a valid id or label.`);
+    }
+    const policy: DecisionParameterGroupPolicy = candidate.policy === "sum-to-one" ? "sum-to-one" : "none";
+    return { id: candidate.id.toLowerCase(), label: candidate.label, policy };
+  });
 }
 
 function readParameters(value: unknown): DecisionParameterDefinition[]
@@ -57,6 +88,7 @@ function readParameters(value: unknown): DecisionParameterDefinition[]
       max: finiteOrNull(candidate.max),
       step: finiteOrNull(candidate.step),
       control,
+      groupId: typeof candidate.groupId === "string" && candidate.groupId.trim().length > 0 ? candidate.groupId.toLowerCase() : null,
     };
   });
 }
@@ -101,6 +133,7 @@ export function serializeDecisionRecipe(definition: DecisionFunctionDefinition):
       description: definition.description,
       category: definition.category,
       expression: definition.expression,
+      parameterGroups: definition.parameterGroups.map((item) => ({ ...item })),
       parameters: definition.parameters.map((item) => ({ ...item })),
       eligibilityRules: definition.eligibilityRules.map((item) => ({ ...item })),
     },
@@ -125,7 +158,7 @@ export function parseDecisionRecipe(text: string): DecisionFunctionDefinition
     throw new Error("The selected file is not a decision recipe object.");
   }
   const file = parsed as Partial<DecisionRecipeFile>;
-  if (file.schema !== decisionRecipeSchema)
+  if (file.schema !== decisionRecipeSchema && file.schema !== legacyDecisionRecipeSchema)
   {
     throw new Error(`Unsupported decision recipe schema '${String(file.schema ?? "missing")}'.`);
   }
@@ -142,6 +175,13 @@ export function parseDecisionRecipe(text: string): DecisionFunctionDefinition
     throw new Error("The decision recipe is missing name, description, or expression fields.");
   }
 
+  const parameterGroups = readParameterGroups(recipe.parameterGroups);
+  const groupIds = new Set(parameterGroups.map((group) => group.id));
+  const parameters = readParameters(recipe.parameters ?? []).map((parameter) => ({
+    ...parameter,
+    groupId: parameter.groupId !== null && groupIds.has(parameter.groupId) ? parameter.groupId : null,
+  }));
+
   const imported = createCustomDecisionFunction();
   return {
     ...imported,
@@ -149,7 +189,8 @@ export function parseDecisionRecipe(text: string): DecisionFunctionDefinition
     description: recipe.description,
     category: typeof recipe.category === "string" && recipe.category.trim().length > 0 ? recipe.category : "Imported",
     expression: recipe.expression,
-    parameters: readParameters(recipe.parameters ?? []),
+    parameterGroups,
+    parameters,
     eligibilityRules: readRules(recipe.eligibilityRules ?? []),
   };
 }

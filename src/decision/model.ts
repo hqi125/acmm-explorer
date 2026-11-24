@@ -4,6 +4,15 @@ export type EligibilityOperator = ">=" | ">" | "<=" | "<";
 
 export type DecisionParameterControl = "number" | "slider";
 
+export type DecisionParameterGroupPolicy = "none" | "sum-to-one";
+
+export interface DecisionParameterGroupDefinition
+{
+  id: string;
+  label: string;
+  policy: DecisionParameterGroupPolicy;
+}
+
 export interface DecisionParameterDefinition
 {
   id: string;
@@ -13,6 +22,7 @@ export interface DecisionParameterDefinition
   max: number | null;
   step: number | null;
   control: DecisionParameterControl;
+  groupId: string | null;
 }
 
 export interface DecisionEligibilityRule
@@ -30,6 +40,7 @@ export interface DecisionFunctionDefinition
   description: string;
   category: string;
   expression: string;
+  parameterGroups: DecisionParameterGroupDefinition[];
   parameters: DecisionParameterDefinition[];
   eligibilityRules: DecisionEligibilityRule[];
   source: "preset" | "custom";

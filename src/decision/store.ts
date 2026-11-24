@@ -3,6 +3,8 @@ import type {
   DecisionFunctionDefinition,
   DecisionParameterControl,
   DecisionParameterDefinition,
+  DecisionParameterGroupDefinition,
+  DecisionParameterGroupPolicy,
 } from "./model";
 import { decisionFunctionPresets } from "./presets";
 
@@ -11,6 +13,31 @@ const storageKey = "acmm-explorer-decision-functions-v1";
 function finiteOrNull(value: unknown): number | null
 {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function normalizeParameterGroups(value: unknown): DecisionParameterGroupDefinition[]
+{
+  if (!Array.isArray(value))
+  {
+    return [];
+  }
+
+  return value.flatMap((item): DecisionParameterGroupDefinition[] =>
+  {
+    if (typeof item !== "object" || item === null)
+    {
+      return [];
+    }
+
+    const candidate = item as Partial<DecisionParameterGroupDefinition>;
+    if (typeof candidate.id !== "string" || typeof candidate.label !== "string")
+    {
+      return [];
+    }
+
+    const policy: DecisionParameterGroupPolicy = candidate.policy === "sum-to-one" ? "sum-to-one" : "none";
+    return [{ id: candidate.id.toLowerCase(), label: candidate.label, policy }];
+  });
 }
 
 function normalizeParameters(value: unknown): DecisionParameterDefinition[]
@@ -43,6 +70,7 @@ function normalizeParameters(value: unknown): DecisionParameterDefinition[]
       max: finiteOrNull(candidate.max),
       step: finiteOrNull(candidate.step),
       control,
+      groupId: typeof candidate.groupId === "string" && candidate.groupId.trim().length > 0 ? candidate.groupId.toLowerCase() : null,
     }];
   });
 }
@@ -105,13 +133,21 @@ function readCustomFunctions(): DecisionFunctionDefinition[]
         return [];
       }
 
+      const parameterGroups = normalizeParameterGroups(candidate.parameterGroups);
+      const groupIds = new Set(parameterGroups.map((group) => group.id));
+      const parameters = normalizeParameters(candidate.parameters).map((parameter) => ({
+        ...parameter,
+        groupId: parameter.groupId !== null && groupIds.has(parameter.groupId) ? parameter.groupId : null,
+      }));
+
       return [{
         id: candidate.id,
         name: candidate.name,
         description: candidate.description,
         category: typeof candidate.category === "string" && candidate.category.trim().length > 0 ? candidate.category : "Custom",
         expression: candidate.expression,
-        parameters: normalizeParameters(candidate.parameters),
+        parameterGroups,
+        parameters,
         eligibilityRules: normalizeRules(candidate.eligibilityRules),
         source: "custom",
         createdAt: typeof candidate.createdAt === "string" ? candidate.createdAt : null,
@@ -145,6 +181,7 @@ export function createCustomDecisionFunction(source?: DecisionFunctionDefinition
     description: source?.description ?? "Custom decision function.",
     category: "Custom",
     expression: source?.expression ?? decisionFunctionPresets[0].expression,
+    parameterGroups: source?.parameterGroups.map((item) => ({ ...item })) ?? [],
     parameters: source?.parameters.map((item) => ({ ...item })) ?? [],
     eligibilityRules: source?.eligibilityRules.map((item) => ({ ...item, id: `${item.id}-${suffix}` })) ?? [],
     source: "custom",
@@ -165,6 +202,7 @@ export function saveDecisionFunction(definition: DecisionFunctionDefinition): De
   const next: DecisionFunctionDefinition = {
     ...definition,
     category: definition.category.trim().length > 0 ? definition.category.trim() : "Custom",
+    parameterGroups: definition.parameterGroups.map((item) => ({ ...item })),
     parameters: definition.parameters.map((item) => ({ ...item })),
     eligibilityRules: definition.eligibilityRules.map((item) => ({ ...item })),
     updatedAt: now,
